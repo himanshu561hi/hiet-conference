@@ -1,0 +1,32 @@
+const mongoose = require('mongoose');
+
+const notificationSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  message: {
+    type: String,
+    required: true
+  },
+  type: {
+    type: String,
+    enum: ['INVITE_RECEIVED', 'INVITE_ACCEPTED', 'INVITE_REJECTED', 'REQUEST_RECEIVED', 'REQUEST_ACCEPTED', 'REQUEST_REJECTED', 'SYSTEM', 'WARNING'],
+    default: 'SYSTEM'
+  },
+  isRead: {
+    type: Boolean,
+    default: false
+  },
+  link: {
+    type: String, // Optional URL to navigate to when clicked
+    default: null
+  }
+}, { timestamps: true });
+
+module.exports = mongoose.model('Notification', notificationSchema);
