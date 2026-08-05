@@ -1,54 +1,107 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import * as Icons from 'lucide-react';
-import { highlightsContent } from '../../content/highlights';
+import { BookOpen, FileCode, Users, Presentation, Award, ShieldCheck, Sparkles } from 'lucide-react';
 import { fadeUpVariant, staggerContainer } from '../../animations/sections';
-import { cardHoverVariant } from '../../animations/cards';
 
 export const WhyParticipate = () => {
-  const { participation } = highlightsContent;
+  const benefits = [
+    {
+      id: 'b1',
+      title: 'Research Methodology',
+      icon: BookOpen,
+      color: 'from-blue-500 to-indigo-500',
+      desc: 'Master academic problem formulations, literature review techniques, and experimental data validation standards.'
+    },
+    {
+      id: 'b2',
+      title: 'IEEE Writing Guidelines',
+      icon: FileCode,
+      color: 'from-emerald-500 to-teal-500',
+      desc: 'Learn manuscript drafting in standard double-column IEEE format, citation management, and reference curation.'
+    },
+    {
+      id: 'b3',
+      title: 'Faculty Mentorship',
+      icon: Users,
+      color: 'from-purple-500 to-violet-500',
+      desc: 'Receive direct one-on-one review guidance from experienced academic researchers and domain experts.'
+    },
+    {
+      id: 'b4',
+      title: 'Paper Presentation',
+      icon: Presentation,
+      color: 'from-amber-500 to-orange-500',
+      desc: 'Present your research before an international panel of judges and gain constructive oral feedback.'
+    },
+    {
+      id: 'b5',
+      title: 'Publication Opportunity',
+      icon: ShieldCheck,
+      color: 'from-teal-500 to-cyan-500',
+      desc: 'Accepted high-impact papers receive pre-conference publication in official partner proceedings.'
+    },
+    {
+      id: 'b6',
+      title: 'Recognition & Certificate',
+      icon: Award,
+      color: 'from-indigo-500 to-blue-600',
+      desc: 'Earn official certificates of merit, publication awards, and recognition for your resume.'
+    }
+  ];
 
   return (
-    <section className="py-24 bg-surface">
-      <div className="container mx-auto px-4 md:px-6">
+    <section className="py-20 md:py-28 bg-white border-b border-slate-200/70 relative overflow-hidden">
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
         <motion.div 
-          className="text-center max-w-2xl mx-auto mb-16"
+          className="text-center max-w-3xl mx-auto mb-16"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
         >
-          <motion.h2 variants={fadeUpVariant} className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-6">
-            {participation.heading}
+          <motion.span variants={fadeUpVariant} className="inline-block px-3.5 py-1 rounded-full bg-emerald-100/80 border border-emerald-200 text-emerald-800 text-xs font-bold tracking-widest uppercase mb-3">
+            Why Participate
+          </motion.span>
+          <motion.h2 variants={fadeUpVariant} className="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
+            Accelerate Your Research Journey
           </motion.h2>
-          <motion.p variants={fadeUpVariant} className="text-lg text-gray-600">
-            {participation.description}
+          <motion.p variants={fadeUpVariant} className="text-base md:text-lg text-slate-600 font-medium">
+            Gain invaluable research experience, formal publication credentials, and mentorship from leading academics.
           </motion.p>
         </motion.div>
 
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {participation.benefits.map((benefit) => {
-            const IconComponent = Icons[benefit.icon] || Icons.CheckCircle;
+          {benefits.map((benefit) => {
+            const Icon = benefit.icon;
             
             return (
               <motion.div
                 key={benefit.id}
-                variants={cardHoverVariant}
-                initial="rest"
-                whileHover="hover"
-                className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-start"
+                variants={fadeUpVariant}
+                whileHover={{ y: -6, transition: { duration: 0.25 } }}
+                className="group bg-gradient-to-b from-slate-50/80 to-white p-7 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xl hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between"
               >
-                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-6">
-                  <IconComponent className="w-7 h-7" strokeWidth={1.5} />
+                <div>
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${benefit.color} text-white flex items-center justify-center shadow-md mb-6 group-hover:scale-105 transition-transform`}>
+                    <Icon className="w-7 h-7" strokeWidth={1.75} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2.5 group-hover:text-emerald-700 transition-colors">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-slate-600 text-sm leading-relaxed font-normal">
+                    {benefit.desc}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{benefit.desc}</p>
+
+                <div className="pt-4 mt-6 border-t border-slate-100 flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
+                  <Sparkles className="w-3.5 h-3.5" /> Conference Standard
+                </div>
               </motion.div>
             );
           })}
@@ -57,3 +110,4 @@ export const WhyParticipate = () => {
     </section>
   );
 };
+

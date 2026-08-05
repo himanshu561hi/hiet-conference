@@ -1,58 +1,90 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { aboutContent } from '../../content/about';
-import { Button } from '../ui/Button';
+import { Target, Compass, Flag, Sparkles } from 'lucide-react';
 import { fadeUpVariant, staggerContainer } from '../../animations/sections';
 
 export const AboutNexus = () => {
-  const { nexus } = aboutContent;
+  const cards = [
+    {
+      icon: Target,
+      title: "Our Mission",
+      color: "from-blue-500 to-indigo-500",
+      desc: "To cultivate research excellence among undergraduate engineering students by providing a structured peer-reviewed platform for technical manuscript drafting."
+    },
+    {
+      icon: Compass,
+      title: "Our Vision",
+      color: "from-emerald-500 to-teal-500",
+      desc: "To bridge academia and industry research standards, empowering student innovators to publish in international indexed conference proceedings."
+    },
+    {
+      icon: Flag,
+      title: "Core Objectives",
+      color: "from-purple-500 to-violet-500",
+      desc: "Promote IEEE paper formatting mastery, rigorous peer review evaluation, inter-college collaboration, and academic mentorship."
+    }
+  ];
 
   return (
-    <section className="py-20 md:py-32 bg-surface overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <section id="about" className="py-20 md:py-32 bg-slate-50/80 border-b border-slate-200/70 relative overflow-hidden">
+      {/* Background ambient orb */}
+      <div className="absolute top-1/3 left-10 w-96 h-96 bg-blue-500/5 rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
+          {/* Left Column: Heading & Introduction */}
           <motion.div 
+            className="lg:col-span-6 flex flex-col"
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            className="flex flex-col"
+            viewport={{ once: true, margin: "-80px" }}
           >
-            <motion.span variants={fadeUpVariant} className="text-primary font-semibold tracking-wider uppercase mb-4 text-sm">
-              About Nexus
+            <motion.span variants={fadeUpVariant} className="inline-block px-3.5 py-1 rounded-full bg-blue-100/80 border border-blue-200 text-blue-800 text-xs font-bold tracking-widest uppercase mb-4 w-fit">
+              About The Competition
             </motion.span>
-            <motion.h2 variants={fadeUpVariant} className="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-6">
-              {nexus.heading}
-            </motion.h2>
-            <motion.p variants={fadeUpVariant} className="text-lg text-gray-600 mb-8 leading-relaxed max-w-xl">
-              {nexus.description}
-            </motion.p>
             
-            <motion.div variants={fadeUpVariant} className="flex flex-wrap gap-4">
-              {nexus.buttons.map((btn, idx) => (
-                <Link key={idx} to={btn.href} tabIndex={-1}>
-                  <Button variant={btn.variant} size="lg" className={btn.variant === 'primary' ? 'shadow-lg' : 'bg-white'}>
-                    {btn.label}
-                  </Button>
-                </Link>
-              ))}
-            </motion.div>
+            <motion.h2 variants={fadeUpVariant} className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 leading-tight mb-6 tracking-tight">
+              Fostering Academic Excellence & High-Impact Research
+            </motion.h2>
+            
+            <motion.p variants={fadeUpVariant} className="text-slate-600 text-base md:text-lg font-normal leading-relaxed mb-6">
+              NEXUS 2026 is an flagship pre-conference research paper writing competition hosted by Tech Fusion — the official technical club of HIET, in association with ICDETGT-2026.
+            </motion.p>
+
+            <motion.p variants={fadeUpVariant} className="text-slate-600 text-sm md:text-base font-normal leading-relaxed mb-8">
+              Designed as a stepping stone for aspiring researchers, NEXUS 2026 offers comprehensive faculty guidance, IEEE formatting workshops, and publication opportunities for original student research.
+            </motion.p>
           </motion.div>
 
+          {/* Right Column: Mission, Vision, Objectives Cards (Receiving the logo scroll transition) */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="lg:col-span-6 space-y-5"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
-            className="relative h-[400px] lg:h-[500px] rounded-2xl bg-gradient-to-br from-primary/10 to-blue-500/10 border border-white/40 shadow-2xl flex items-center justify-center overflow-hidden"
           >
-            {/* Minimal SVG Illustration Placeholder */}
-            <div className="absolute inset-0 bg-white/20 backdrop-blur-xl" />
-            <svg className="w-64 h-64 text-primary opacity-20 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-            </svg>
+            {cards.map((card, idx) => {
+              const Icon = card.icon;
+              return (
+                <motion.div
+                  key={idx}
+                  variants={fadeUpVariant}
+                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex items-start gap-5"
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.color} text-white flex items-center justify-center shrink-0 shadow-xs`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-extrabold text-slate-900 mb-1.5">{card.title}</h3>
+                    <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{card.desc}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
         </div>
@@ -60,3 +92,4 @@ export const AboutNexus = () => {
     </section>
   );
 };
+

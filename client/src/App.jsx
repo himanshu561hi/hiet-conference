@@ -15,6 +15,10 @@ import { PageTransition } from './utils/PageTransition';
 
 // Pages
 import { Home } from './pages/Home';
+import { AboutPage } from './pages/AboutPage';
+import { TracksPage } from './pages/TracksPage';
+import { TimelinePage } from './pages/TimelinePage';
+import { ContactPage } from './pages/ContactPage';
 import { Register } from './pages/Register';
 import { Signup } from './pages/auth/Signup';
 import { Login } from './pages/auth/Login';
@@ -22,7 +26,7 @@ import { AdminLogin } from './pages/auth/AdminLogin';
 import { VerifyEmail } from './pages/auth/VerifyEmail';
 import { ForgotPassword } from './pages/auth/ForgotPassword';
 import { InitializeProfile } from './pages/profile/InitializeProfile';
-// Dashboard Pages
+// Dashboard & Admin Pages
 import { TeamDashboard } from './pages/dashboard/TeamDashboard';
 import { CreateTeam } from './pages/dashboard/CreateTeam';
 import { MemberDashboard } from './pages/dashboard/MemberDashboard';
@@ -32,16 +36,22 @@ import { AdminAnalyticsDashboard } from './pages/admin/AdminAnalyticsDashboard';
 import { AdminSettings } from './pages/admin/AdminSettings';
 import { AdminReports } from './pages/admin/AdminReports';
 
+
 function App() {
   return (
     <HelmetProvider>
       <AuthProvider>
         <Routes>
-          {/* Public Website Routes */}
+          {/* Public Website Routes (Multi-Page Architecture) */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+            <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
+            <Route path="/tracks" element={<PageTransition><TracksPage /></PageTransition>} />
+            <Route path="/timeline" element={<PageTransition><TimelinePage /></PageTransition>} />
+            <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
             <Route path="/register" element={<Register />} />
           </Route>
+
 
           {/* Authentication Routes */}
           <Route element={<AuthLayout />}>

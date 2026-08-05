@@ -1,11 +1,17 @@
 export const contactData = {
-  conferenceEmail: "support@nexus2026.com",
-  phone: "+91 9876543210",
+  conferenceEmail: "techfusion9560@gmail.com",
+  phone: "+91 95600 00000",
   address: "Hi-Tech Institute of Engineering & Technology, Ghaziabad, UP, India",
-  website: "www.nexus2026.com",
+  website: "hiet-nexus.netlify.app",
+  socialLinks: {
+    instagram: "https://www.instagram.com/hiet.techfusion/",
+    linkedin: "https://www.linkedin.com/company/hiet-techfusion/",
+    website: "https://hiet-nexus.netlify.app/",
+    email: "techfusion9560@gmail.com"
+  },
   coordinators: [
-    { id: "c1", name: "Pending Official Information", role: "Event Coordinator", phone: "+91 0000000000" },
-    { id: "c2", name: "Pending Official Information", role: "Technical Head", phone: "+91 0000000000" }
+    { id: "c1", name: "Event Coordinators", role: "Tech Fusion Team", phone: "techfusion9560@gmail.com" },
+    { id: "c2", name: "Technical Support", role: "HIET Student Chapter", phone: "hiet-nexus.netlify.app" }
   ],
   venue: {
     name: "Main Auditorium, HIET Campus",
