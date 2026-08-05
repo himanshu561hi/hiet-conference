@@ -66,9 +66,14 @@ app.use((req, res, next) => {
   next()
 })
 
+// Default root route
+app.get('/', (req, res) => {
+  res.status(200).send('server run kr rha hai bkl')
+})
+
 // API Versioning & Routes
 app.get('/api/v1', (req, res) => {
-  res.status(200).json({ message: 'Nexus 2026 API v1 is running...' })
+  res.status(200).json({ message: 'server run kr rha hai bkl', version: 'v1' })
 })
 
 app.use('/api/v1/auth', authRoutes)
