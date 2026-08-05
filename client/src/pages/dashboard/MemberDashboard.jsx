@@ -99,13 +99,13 @@ export const MemberDashboard = () => {
         </div>
 
         {/* Create Team Box */}
-        <div className="bg-primary/5 p-6 rounded-2xl shadow-sm border border-primary/20 flex flex-col justify-center items-center text-center">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">Start Your Own Team</h3>
+        <div className="bg-emerald-50 p-6 rounded-2xl shadow-sm border border-emerald-200 flex flex-col justify-center items-center text-center">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">Register for the Event</h3>
           <p className="text-sm text-gray-600 mb-6">
-            Participating Solo or want to lead a group of researchers? Create a new team and invite your peers.
+            Want to lead a research team or participate in NEXUS 2026? Use the official event registration portal to create your team and upload your paper.
           </p>
-          <Button onClick={() => navigate(ROUTES.PRIVATE.CREATE_TEAM)} className="w-full max-w-xs">
-            Create New Team
+          <Button onClick={() => navigate('/register')} className="w-full max-w-xs bg-emerald-600 hover:bg-emerald-700 text-white">
+            Register for Event
           </Button>
         </div>
       </div>

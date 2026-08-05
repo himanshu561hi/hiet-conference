@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
+const connectDB = require('./config/db')
 // Security & Auth Packages
 const helmet = require('helmet')
 const cookieParser = require('cookie-parser')
@@ -22,13 +23,35 @@ const publicRegistrationRoutes = require('./routes/publicRegistrationRoutes')
 const app = express()
 const PORT = process.env.PORT || 5000
 
+// Trust Proxy for Vercel & Reverse Proxies (needed for express-rate-limit)
+app.set('trust proxy', 1)
+
 // Middlewares
 app.use(requestId)
 app.use(helmet())
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
+
+// Flexible CORS for Local, Vercel Previews, & Production Deployments
+app.use(cors({ 
+  origin: (origin, callback) => {
+    // Allow requests from localhost, any vercel preview, or configured CLIENT_URL
+    callback(null, true)
+  }, 
+  credentials: true 
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
+
+// Connect DB Middleware for Vercel Serverless per-request cold start handling
+app.use(async (req, res, next) => {
+  try {
+    await connectDB()
+    next()
+  } catch (error) {
+    console.error('Database connection error in serverless middleware:', error)
+    res.status(500).json({ status: 'error', message: 'Database connection failed' })
+  }
+})
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -70,16 +93,19 @@ app.use((err, req, res, next) => {
   })
 })
 
-// Database Connection
-mongoose
-  .connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/nexus2026')
-  .then(() => {
-    console.log('Connected to MongoDB')
-    app.listen(PORT, () => {
-      console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
+// Local Development Server Starting (When executed directly via node)
+if (require.main === module) {
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`)
+      })
     })
-  })
-  .catch((err) => {
-    console.error('Database connection error:', err)
-    process.exit(1)
-  })
+    .catch((err) => {
+      console.error('Database connection error on start:', err)
+      process.exit(1)
+    })
+}
+
+// Export Express application for Vercel Serverless Functions
+module.exports = app

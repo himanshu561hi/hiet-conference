@@ -5,11 +5,10 @@ import {
   ChevronLeft, Plus, Trash2, UploadCloud, Loader2, 
   Eye, EyeOff, X, AlertCircle
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { tracks } from '../data/tracks';
-
-const API_BASE = 'http://localhost:5001/api/v1';
 
 const STEPS = [
   { id: 1, label: 'Team Info', icon: Users },
@@ -57,6 +56,7 @@ const emptyMember = () => ({ name: '', email: '', mobile: '', branch: '', year: 
 
 export function Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const fileInputRef = useRef(null);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -132,10 +132,13 @@ export function Register() {
       formData.append('keywords', JSON.stringify(paper.keywords.split(',').map(k => k.trim()).filter(Boolean)));
       if (paper.file) formData.append('paper', paper.file);
 
-      const res = await axios.post(`${API_BASE}/public/register`, formData, {
+      const res = await api.post('/v1/public/register', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
+      if (res.data.data?.user) {
+        login(res.data.data.user);
+      }
       setSuccess(res.data.data);
     } catch (err) {
       const msg = err.response?.data?.message || 'Registration failed. Please try again.';
@@ -163,13 +166,13 @@ export function Register() {
             <p className="text-sm text-gray-700"><span className="font-medium">Password:</span> <code className="bg-white border px-2 py-1 rounded text-emerald-700">{success.loginPassword}</code></p>
           </div>
 
-          <p className="text-sm text-gray-500 mb-6">Confirmation emails have been sent to the leader and all team members.</p>
+          <p className="text-sm text-gray-500 mb-6">Confirmation emails have been sent to the leader and all team members. You are now logged in!</p>
 
           <button
-            onClick={() => navigate('/auth/login')}
+            onClick={() => navigate('/dashboard')}
             className="w-full bg-emerald-600 text-white py-3 rounded-xl font-semibold hover:bg-emerald-700 transition"
           >
-            Login to Dashboard →
+            Go to Dashboard →
           </button>
         </div>
       </div>

@@ -250,9 +250,22 @@ exports.publicRegister = async (req, res) => {
       }).catch(err => console.error('[Email Error - Member]:', err));
     }
 
-    // ── Step 6: Respond ────────────────────────────────────────────────────
+    // ── Step 6: Auto-login the leader (set JWT cookie) ────────────────────
+
+    const generateToken = require('../utils/generateToken');
+    generateToken(res, leaderUser._id);
+
+    // ── Step 7: Respond ────────────────────────────────────────────────────
 
     return sendSuccess(res, 201, 'Registration successful! Check your email for login credentials.', {
+      // User data for AuthContext (same format as login)
+      user: {
+        _id: leaderUser._id,
+        userId: leaderUser.userId,
+        fullName: leaderUser.fullName,
+        email: leaderUser.email,
+        role: leaderUser.role,
+      },
       team: {
         id: team._id,
         teamName: team.teamName,
