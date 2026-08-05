@@ -13,8 +13,25 @@ const registrationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Draft', 'Registration Completed', 'Paper Uploaded', 'Submitted', 'Under Review', 'Approved', 'Rejected', 'Needs Correction', 'Locked'],
-    default: 'Draft'
+    enum: ['Draft', 'Registration Completed', 'Paper Uploaded', 'Submitted', 'Under Review', 'Under Hold', 'Approved', 'Rejected', 'Needs Correction', 'Locked'],
+    default: 'Submitted'
+  },
+  rejectionReason: {
+    type: String,
+    default: ''
+  },
+  heldBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  heldByName: {
+    type: String,
+    default: ''
+  },
+  heldByEmail: {
+    type: String,
+    default: ''
   },
   // Module 1 Fields
   paperCategory: {
@@ -91,6 +108,34 @@ const registrationSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isStudent: {
+    type: Boolean,
+    default: true
+  },
+  collegeName: {
+    type: String,
+    default: ''
+  },
+  branch: {
+    type: String,
+    default: ''
+  },
+  year: {
+    type: String,
+    default: ''
+  },
+  organizationName: {
+    type: String,
+    default: ''
+  },
+  state: {
+    type: String,
+    default: ''
+  },
+  district: {
+    type: String,
+    default: ''
+  },
   previousVersions: [{
     version: Number,
     fileUrl: String,
@@ -102,7 +147,6 @@ const registrationSchema = new mongoose.Schema({
 
 // Indexes for Admin Queue Performance
 registrationSchema.index({ status: 1 });
-registrationSchema.index({ registrationNumber: 1 });
 registrationSchema.index({ conferenceTrack: 1 });
 registrationSchema.index({ createdAt: -1 });
 

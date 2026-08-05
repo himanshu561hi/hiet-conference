@@ -7,11 +7,12 @@ const { protect, admin } = require('../middlewares/authMiddleware');
 router.use(protect);
 router.use(admin);
 
-const { approveRegistration, rejectRegistration, requestCorrection, getReviewHistory } = require('../controllers/adminReviewController');
+const { approveRegistration, rejectRegistration, requestCorrection, getReviewHistory, updateRegistrationStatus } = require('../controllers/adminReviewController');
 
 router.get('/metrics', getMetrics);
 router.get('/queue', getQueue);
 router.get('/registration/:id', getRegistrationDetails);
+router.post('/registration/:id/status', updateRegistrationStatus);
 
 // Review Decision Endpoints
 router.post('/review/approve', approveRegistration);

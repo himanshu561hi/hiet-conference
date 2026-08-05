@@ -1,367 +1,400 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { teamApi } from '../../api/team';
-import { teamManagementApi } from '../../api/teamManagement';
-import { requestsApi } from '../../api/requests';
-import { invitesApi } from '../../api/invites';
 import { registrationApi } from '../../api/registration';
 import { useAuth } from '../../context/AuthContext';
-import { ROUTES } from '../../constants/routes';
-import { Button } from '../../components/ui/Button';
-import { TeamTimeline } from '../../components/dashboard/TeamTimeline';
-import { TeamProgress } from '../../components/dashboard/TeamProgress';
-import { RegistrationForm } from '../../components/dashboard/RegistrationForm';
-import { PdfUploader } from '../../components/dashboard/PdfUploader';
-import { FinalSubmissionTab } from '../../components/dashboard/FinalSubmissionTab';
-import { usePermissions } from '../../hooks/usePermissions';
-import { useRegistrationProgress } from '../../hooks/useRegistrationProgress';
 import toast from 'react-hot-toast';
+import {
+  Users, User, FileText, CheckCircle2, Clock, Lock, XCircle, Key, MessageCircle,
+  Download, Building2, MapPin, Calendar, Sparkles, ShieldCheck, Mail, Phone, Eye
+} from 'lucide-react';
+import { TeamTimeline } from '../../components/dashboard/TeamTimeline';
+import { downloadPaperPdf } from '../../utils/downloadHelper';
+
+const STATUS_BADGES = {
+  'Under Review': { bg: 'bg-amber-100 border-amber-300 text-amber-900', icon: Clock, label: 'Under Review' },
+  'Submitted': { bg: 'bg-blue-100 border-blue-300 text-blue-900', icon: Clock, label: 'Submitted (Under Review)' },
+  'Under Hold': { bg: 'bg-purple-100 border-purple-300 text-purple-900', icon: Lock, label: 'Under Hold by Mentor' },
+  'Approved': { bg: 'bg-emerald-100 border-emerald-300 text-emerald-900', icon: CheckCircle2, label: 'Accepted for Round 2' },
+  'Accepted': { bg: 'bg-emerald-100 border-emerald-300 text-emerald-900', icon: CheckCircle2, label: 'Accepted for Round 2' },
+  'Rejected': { bg: 'bg-rose-100 border-rose-300 text-rose-900', icon: XCircle, label: 'Application Rejected' }
+};
 
 export const TeamDashboard = () => {
-  const [team, setTeam] = useState(null);
-  const [registration, setRegistration] = useState(null);
-  const [activeReview, setActiveReview] = useState(null);
-  const [liveRegistration, setLiveRegistration] = useState(null);
-  const [currentVersion, setCurrentVersion] = useState(1);
-  
-  const [pendingRequests, setPendingRequests] = useState([]);
-  const [pendingInvites, setPendingInvites] = useState([]);
-  const [inviteTarget, setInviteTarget] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const { isLeader, isLocked } = usePermissions(team);
-  const progress = useRegistrationProgress(liveRegistration || registration, team);
+  const [team, setTeam] = useState(null);
+  const [registration, setRegistration] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const fetchTeamAndRequests = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const res = await teamApi.getMyTeam();
-      if (res.success) {
-        setTeam(res.data);
-        
-        try {
-          const regRes = await registrationApi.getRegistrationMe();
-          if (regRes.data?.registration) {
-            setRegistration(regRes.data.registration);
-            setActiveReview(regRes.data.activeReview || null);
-            setLiveRegistration(regRes.data.registration);
-            setCurrentVersion(regRes.data.registration.version);
-          }
-        } catch (regErr) {
-          console.error("Registration fetch failed", regErr);
-        }
+      setIsLoading(true);
+      const [teamRes, regRes] = await Promise.all([
+        teamApi.getMyTeam().catch(() => null),
+        registrationApi.getRegistrationMe().catch(() => null)
+      ]);
 
-        if (res.data.leader?._id === user?._id) {
-          const [reqRes, invRes] = await Promise.all([
-            requestsApi.getTeamRequests(),
-            invitesApi.getTeamInvites()
-          ]);
-          if (reqRes.success) setPendingRequests(reqRes.data);
-          if (invRes.success) setPendingInvites(invRes.data);
-        }
-      }
+      if (teamRes?.success) setTeam(teamRes.data);
+      if (regRes?.data?.registration) setRegistration(regRes.data.registration);
+      else if (teamRes?.data?.registration) setRegistration(teamRes.data.registration);
     } catch (err) {
-      if (err.response?.data?.code === 'TM_008') {
-        navigate(ROUTES.PRIVATE.MEMBER_DASHBOARD || '/dashboard/member');
-      } else {
-        toast.error('Failed to load team data');
-      }
+      console.error('[Dashboard Data Error]:', err);
+      toast.error('Failed to load dashboard data');
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTeamAndRequests();
-  }, [navigate]);
-
-  const copyToClipboard = (text, label) => {
-    navigator.clipboard.writeText(text);
-    toast.success(`${label} copied to clipboard!`);
-  };
-
-  const handleRemoveMember = async (targetId) => {
-    if (!window.confirm("Are you sure you want to remove this member?")) return;
-    try {
-      await teamManagementApi.removeMember(team._id, targetId);
-      toast.success("Member removed.");
-      fetchTeamAndRequests();
-    } catch (err) { toast.error(err.response?.data?.message || 'Action failed.'); }
-  };
-
-  const handleLeaveTeam = async () => {
-    if (!window.confirm("Are you sure you want to leave this team?")) return;
-    try {
-      await teamManagementApi.leaveTeam(team._id);
-      toast.success("You have left the team.");
-      navigate('/dashboard/member');
-    } catch (err) { toast.error(err.response?.data?.message || 'Action failed.'); }
-  };
-
-  const handleTransferLeadership = async (targetId) => {
-    if (!window.confirm("Are you sure you want to transfer leadership to this member? You will become a regular member.")) return;
-    try {
-      await teamManagementApi.transferLeadership(team._id, targetId);
-      toast.success("Leadership transferred.");
-      fetchTeamAndRequests();
-    } catch (err) { toast.error(err.response?.data?.message || 'Action failed.'); }
-  };
+    fetchDashboardData();
+  }, []);
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-64">Loading Team Data...</div>;
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans">
+        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl text-center space-y-3">
+          <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-xs font-bold text-slate-700">Loading Leader Dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
-  if (!team) return null;
+  const currentStatus = registration?.status || team?.status || 'Submitted';
+  const badgeConfig = STATUS_BADGES[currentStatus] || STATUS_BADGES['Under Review'];
+  const StatusIcon = badgeConfig.icon;
+
+  const leaderUser = team?.leader || user;
+  const leaderEmailLower = (leaderUser?.email || '').toLowerCase().trim();
+  const leaderId = (leaderUser?._id || '').toString();
+
+  const leaderFirstName = (leaderUser?.fullName || leaderUser?.name || 'user').trim().split(' ')[0].toLowerCase();
+  const leaderLast4 = (leaderUser?.mobile || '').replace(/\D/g, '').slice(-4);
+  const leaderPassword = leaderLast4 ? `${leaderFirstName}${leaderLast4}` : 'N/A';
+
+  const additionalMembers = (team?.members || []).filter(m => {
+    const memEmail = (m.email || m.user?.email || '').toLowerCase().trim();
+    const memId = (m.user?._id || m.userId || '').toString();
+    if (leaderEmailLower && memEmail === leaderEmailLower) return false;
+    if (leaderId && memId === leaderId) return false;
+    return true;
+  });
+
+  const totalMembersCount = 1 + additionalMembers.length;
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-      
-      {/* Left / Main Column */}
-      <div className="lg:col-span-2 space-y-8">
-        
-        {/* User Profile Welcome Banner */}
-        <div className="bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-2xl p-6 text-white shadow-md flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold mb-1">Welcome, {user?.fullName}</h2>
-            <p className="text-emerald-50 opacity-90 text-sm">
-              Logged in as: <span className="font-semibold">{user?.email}</span> 
-              <span className="mx-2">•</span> 
-              Role: <span className="capitalize">{user?.role}</span>
-            </p>
-          </div>
-          <div className="hidden md:block">
-            <div className="h-16 w-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <span className="text-2xl font-bold">{user?.fullName?.charAt(0)}</span>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-slate-50 text-slate-800 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-5xl mx-auto space-y-6">
 
-        <div className="flex justify-between items-end">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Team Overview</h1>
-            <p className="text-gray-500">Manage your NEXUS 2026 participation</p>
-          </div>
-          <div className="px-4 py-2 bg-primary/10 text-primary font-bold rounded-lg border border-primary/20">
-            {team.status}
-          </div>
-        </div>
+        {/* ── Join Official WhatsApp Community Section ───────────────────────────── */}
+        <div className="bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 text-white rounded-3xl p-6 sm:p-7 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden">
+          <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Details</h3>
-            <div className="space-y-4">
-              <div><span className="block text-sm text-gray-500">Team Name</span><span className="font-semibold">{team.teamName}</span></div>
-              <div><span className="block text-sm text-gray-500">Type</span><span className="font-semibold">{team.teamType}</span></div>
+          <div className="flex items-start gap-4 relative z-10">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/30 text-2xl shadow-inner">
+              💬
             </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Identifiers</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div><span className="block text-sm text-gray-500">Team ID</span><span className="font-mono font-bold">{team.teamId}</span></div>
-                <Button variant="outline" size="sm" onClick={() => copyToClipboard(team.teamId, 'Team ID')}>Copy</Button>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono uppercase font-extrabold bg-white/20 border border-white/30 px-2.5 py-0.5 rounded-full text-emerald-100 tracking-wider">
+                  Official Author Group
+                </span>
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                </span>
               </div>
-              <div className="flex justify-between items-center">
-                <div><span className="block text-sm text-gray-500">Join Code</span><span className="font-mono font-bold text-primary">{team.joinCode}</span></div>
-                <Button variant="outline" size="sm" onClick={() => copyToClipboard(team.joinCode, 'Join Code')}>Copy</Button>
-              </div>
+              <h2 className="text-lg sm:text-xl font-extrabold text-white">Join NEXUS 2026 WhatsApp Community</h2>
+              <p className="text-xs text-emerald-100/90 leading-relaxed max-w-xl font-medium">
+                Get real-time paper evaluation status, round 2 screening alerts, presentation schedules, and direct support from event coordinators.
+              </p>
             </div>
           </div>
+
+          <a
+            href="https://chat.whatsapp.com/DjtjGF2LAc892Caura0BBV?s=cl&p=a&mlu=0&ilr=4"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto shrink-0 relative z-10"
+          >
+            <button
+              type="button"
+              className="w-full sm:w-auto bg-white hover:bg-emerald-50 text-emerald-800 font-extrabold px-6 py-3.5 rounded-2xl transition-all shadow-lg hover:scale-105 flex items-center justify-center gap-2 text-xs cursor-pointer"
+            >
+              <MessageCircle className="w-4 h-4 text-emerald-600 fill-emerald-600/20" />
+              Join WhatsApp Group Now →
+            </button>
+          </a>
         </div>
 
-        {/* Members Section */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <div className="flex justify-between items-center mb-4 border-b pb-2">
-            <h3 className="text-lg font-bold text-gray-900">Members ({team.members.length}/{team.teamType === 'Solo' ? 1 : 3})</h3>
-            <div className="flex gap-2">
-              {!isLeader && <Button variant="outline" size="sm" className="text-red-500 hover:bg-red-50" onClick={handleLeaveTeam}>Leave Team</Button>}
+        {/* Read-Only Banner Notice */}
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900">Read-Only Leader Dashboard</p>
+              <p className="text-[11px] text-slate-600">All submitted registration & paper details are strictly read-only and locked for evaluation.</p>
             </div>
           </div>
-          
-          <div className="space-y-3">
-            {team.members.map((member, index) => {
-              const memberIsLeader = member.user?._id === team.leader?._id;
-              const isMe = member.user?._id === user?._id;
-              return (
-                <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <span className="block font-semibold text-gray-900">
-                      {member.user?.fullName || 'Unknown'} {isMe && '(You)'}
-                    </span>
-                    <span className="text-xs text-gray-500 block">{member.userId}</span>
-                    <span className="text-xs text-gray-500 block">{member.user?.email}</span>
-                    <span className="text-xs text-gray-500 block">{member.user?.mobile}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    {memberIsLeader && <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">Leader</span>}
-                    
-                    {/* Leader Controls over other members */}
-                    {isLeader && !isMe && (
-                      <>
-                        <button onClick={() => handleTransferLeadership(member.user._id)} className="text-xs text-blue-600 font-semibold hover:underline">Make Leader</button>
-                        <button onClick={() => handleRemoveMember(member.user._id)} className="text-xs text-red-600 font-semibold hover:underline">Remove</button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+          <span className="text-[10px] font-mono font-bold bg-white text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full uppercase">
+            Locked View Mode
+          </span>
         </div>
 
-        {/* Registration Components */}
-        <div className="space-y-8 mt-8">
-          {!isLeader && (
-            <div className="bg-blue-50 border border-blue-100 text-blue-800 p-4 rounded-xl flex items-start gap-3">
-              <span className="text-xl">ℹ️</span>
-              <div>
-                <h4 className="font-semibold">Read-Only Mode</h4>
-                <p className="text-sm mt-1">You are a team member. Only the Team Leader can modify the registration details.</p>
-              </div>
+        {/* ── Top Header: Welcome Banner & Status ────────────────────────────── */}
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+            <div>
+              <span className="text-xs font-mono uppercase text-emerald-800 font-bold bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300">
+                Team Leader Dashboard
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
+                Team: {team?.teamName || registration?.teamName || 'Your Team'}
+              </h1>
+              <p className="text-xs text-slate-500 mt-1">
+                Registration ID: <strong className="font-mono text-emerald-700">{team?.teamId || registration?.registrationNumber || 'NEXUS-2026-REG'}</strong>
+              </p>
+            </div>
+
+            {/* Live Status Badge */}
+            <div className={`px-4 py-2.5 rounded-2xl border ${badgeConfig.bg} flex items-center gap-2 font-bold text-xs shadow-sm shrink-0`}>
+              <StatusIcon className="w-4 h-4" />
+              <span>{badgeConfig.label}</span>
+            </div>
+          </div>
+
+          {/* Rejection Remarks Notice if Rejected */}
+          {currentStatus === 'Rejected' && registration?.rejectionReason && (
+            <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl space-y-1">
+              <p className="text-xs font-bold text-rose-800 flex items-center gap-1.5">
+                <XCircle className="w-4 h-4 text-rose-600" /> Faculty Rejection Feedback:
+              </p>
+              <p className="text-xs text-rose-900 leading-relaxed font-medium bg-white p-3 rounded-xl border border-rose-200">
+                "{registration.rejectionReason}"
+              </p>
             </div>
           )}
 
-          <RegistrationForm 
-            team={team} 
-            registration={registration} 
-            isLeader={isLeader} 
-            isLocked={isLocked}
-            activeReview={activeReview}
-            onVersionUpdate={setCurrentVersion}
-            onLiveUpdate={setLiveRegistration}
-          />
-
-          <PdfUploader 
-            registration={liveRegistration || registration} 
-            isLeader={isLeader} 
-            isLocked={isLocked}
-            onUploadSuccess={(updatedReg) => {
-              setLiveRegistration((prev) => ({ ...prev, ...updatedReg }));
-              setCurrentVersion(updatedReg.version);
-            }}
-          />
-
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 border-b pb-2 mb-4">Finalize Registration</h3>
-            <FinalSubmissionTab 
-              team={team} 
-              registration={liveRegistration || registration} 
-              isLeader={isLeader} 
-              isLocked={isLocked} 
-            />
-          </div>
-        </div>
-
-      </div>
-
-      {/* Right Column (Progress & Timeline) */}
-      <div className="space-y-8">
-        <TeamProgress team={team} />
-        
-        {/* Invitations Section (Module 2) */}
-        {isLeader && (
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Invite Members</h3>
-            <div className="flex flex-col gap-4 mb-4">
-              <input 
-                type="text" 
-                value={inviteTarget}
-                onChange={(e) => setInviteTarget(e.target.value)}
-                placeholder="Enter User ID or Email" 
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none"
-              />
-              <Button 
-                onClick={async () => {
-                  if (!inviteTarget.trim()) return toast.error("Please enter an email or User ID.");
-                  try {
-                    await invitesApi.sendInvite({ inviteeIdentifier: inviteTarget.trim() });
-                    toast.success("Invite sent successfully!");
-                    setInviteTarget('');
-                  } catch (err) { toast.error(err.response?.data?.message || 'Failed to send invite.'); }
-                }}
-              >Send Invite</Button>
+          {/* Leader Profile Summary Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+              <span className="text-[10px] text-slate-500 font-mono uppercase block">Team Leader</span>
+              <p className="font-bold text-slate-900 text-sm mt-0.5">{leaderUser?.fullName || leaderUser?.name}</p>
             </div>
-            
-            <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 mt-8">Pending Join Requests</h3>
-            {pendingRequests.length === 0 ? (
-              <p className="text-sm text-gray-500">No pending join requests.</p>
-            ) : (
-              <div className="space-y-3">
-                {pendingRequests.map(req => (
-                  <div key={req._id} className="flex flex-col gap-2 p-3 border border-gray-200 rounded-lg bg-gray-50">
-                    <div>
-                      <span className="font-semibold block">{req.member?.fullName}</span>
-                      <span className="text-xs text-gray-500">{req.member?.email}</span>
-                    </div>
-                    <div className="flex gap-2 mt-2">
-                      <Button 
-                        size="sm" 
-                        onClick={async () => {
-                          try {
-                            await requestsApi.acceptRequest(req._id);
-                            toast.success("Request accepted!");
-                            fetchTeamAndRequests();
-                          } catch (err) { toast.error(err.response?.data?.message || 'Action failed.'); }
-                        }}
-                      >Accept</Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-500"
-                        onClick={async () => {
-                          try {
-                            await requestsApi.rejectRequest(req._id);
-                            toast.success("Request rejected.");
-                            fetchTeamAndRequests();
-                          } catch (err) { toast.error(err.response?.data?.message || 'Action failed.'); }
-                        }}
-                      >Reject</Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+              <span className="text-[10px] text-slate-500 font-mono uppercase block">Leader Email</span>
+              <p className="font-bold text-slate-900 text-sm mt-0.5 truncate">{leaderUser?.email}</p>
+            </div>
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+              <span className="text-[10px] text-slate-500 font-mono uppercase block">Leader Mobile</span>
+              <p className="font-bold text-slate-900 text-sm mt-0.5">{leaderUser?.mobile || 'N/A'}</p>
+            </div>
+            <div className="bg-emerald-50/80 p-4 rounded-2xl border border-emerald-200 flex flex-col justify-between">
+              <span className="text-[10px] text-emerald-800 font-mono uppercase font-bold flex items-center gap-1">
+                <Key className="w-3 h-3 text-emerald-600" /> Login Password
+              </span>
+              <p className="font-mono font-bold text-emerald-800 text-sm mt-0.5 bg-white px-2.5 py-0.5 rounded-lg border border-emerald-300 w-fit shadow-xs">
+                {leaderPassword}
+              </p>
+            </div>
+          </div>
+        </div>
 
-            <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 mt-8">Sent Invitations</h3>
-            {pendingInvites.length === 0 ? (
-              <p className="text-sm text-gray-500">No pending sent invitations.</p>
-            ) : (
-              <div className="space-y-3">
-                {pendingInvites.map(inv => (
-                  <div key={inv._id} className="flex flex-col gap-2 p-3 border border-gray-200 rounded-lg bg-gray-50 flex-row justify-between items-center">
-                    <div>
-                      <span className="font-semibold block">{inv.invitee?.fullName}</span>
-                      <span className="text-xs text-gray-500">{inv.invitee?.email}</span>
-                      <span className="text-xs font-semibold text-amber-600 block mt-1">Status: {inv.status}</span>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="text-red-500"
-                      onClick={async () => {
-                        try {
-                          await invitesApi.cancelInvite(inv._id);
-                          toast.success("Invite cancelled.");
-                          fetchTeamAndRequests();
-                        } catch (err) { toast.error(err.response?.data?.message || 'Action failed.'); }
-                      }}
-                    >Cancel</Button>
+        {/* ── Single Consolidated Card: Team Roster & Member Academic Details ────────────────── */}
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 pb-4 gap-2">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Users className="w-5 h-5 text-emerald-600" /> Team Roster & Academic Details
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Full academic & contact details for all participating team members
+              </p>
+            </div>
+            <span className="text-xs text-slate-700 font-mono font-bold bg-emerald-50 border border-emerald-200 px-3.5 py-1 rounded-full">
+              {totalMembersCount} Total Participant{totalMembersCount === 1 ? '' : 's'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            {/* Leader Card */}
+            <div className="bg-emerald-50/70 border-2 border-emerald-300 rounded-2xl p-5 space-y-3 shadow-sm relative flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between border-b border-emerald-200/80 pb-2.5 mb-3">
+                  <span className="text-[10px] font-bold text-emerald-900 bg-emerald-200/80 px-2.5 py-0.5 rounded-md font-mono uppercase tracking-wider border border-emerald-300">
+                    Leader (Primary Author)
+                  </span>
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                </div>
+
+                <div className="space-y-1">
+                  <p className="font-extrabold text-slate-900 text-base">{leaderUser?.fullName || leaderUser?.name}</p>
+                  <p className="text-xs text-slate-600 flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> {leaderUser?.email}</p>
+                  <p className="text-xs text-slate-600 flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-emerald-600 shrink-0" /> {leaderUser?.mobile || 'N/A'}</p>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-emerald-200/80 space-y-1.5 text-xs text-slate-700 font-sans">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">College / Org:</span>
+                  <span className="font-bold text-slate-900 text-right">
+                    {leaderUser?.college || registration?.collegeName || registration?.institute || team?.institute || (registration?.organizationName ? `Org: ${registration.organizationName}` : null) || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Branch:</span>
+                  <span className="font-bold text-slate-900">{leaderUser?.branch || registration?.branch || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Year:</span>
+                  <span className="font-bold text-slate-900">{leaderUser?.year || registration?.year || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Location:</span>
+                  <span className="font-bold text-slate-900">
+                    {[leaderUser?.district || registration?.district, leaderUser?.state || registration?.state].filter(Boolean).join(', ') || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Team Members */}
+            {additionalMembers.map((m, idx) => (
+              <div key={idx} className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm hover:border-slate-300 transition flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-2.5 mb-3">
+                    <span className="text-[10px] font-bold text-slate-700 bg-slate-200 px-2.5 py-0.5 rounded-md font-mono uppercase tracking-wider">
+                      Team Member #{idx + 1}
+                    </span>
+                    <User className="w-4 h-4 text-slate-400" />
                   </div>
-                ))}
+
+                  <div className="space-y-1">
+                    <p className="font-extrabold text-slate-900 text-base">{m.fullName || m.name || m.user?.fullName}</p>
+                    <p className="text-xs text-slate-600 flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" /> {m.email || m.user?.email}</p>
+                    <p className="text-xs text-slate-600 flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" /> {m.mobile || m.user?.mobile || 'N/A'}</p>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-200 space-y-1.5 text-xs text-slate-700 font-sans">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">College / Org:</span>
+                    <span className="font-bold text-slate-900 text-right">{m.college || m.user?.college || registration?.collegeName || registration?.institute || team?.institute || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Branch:</span>
+                    <span className="font-bold text-slate-900">{m.branch || m.user?.branch || registration?.branch || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Year:</span>
+                    <span className="font-bold text-slate-900">{m.year || m.user?.year || registration?.year || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Location:</span>
+                    <span className="font-bold text-slate-900">
+                      {[m.district || m.user?.district || registration?.district, m.state || m.user?.state || registration?.state].filter(Boolean).join(', ') || 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+          </div>
+        </div>
+
+        {/* ── Submitted Research Paper Details (Read-Only) ───────────────────── */}
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-5">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-emerald-600" /> Submitted Research Paper
+            </h2>
+            <span className="text-xs font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full font-bold">
+              PDF Uploaded
+            </span>
+          </div>
+
+          <div className="space-y-4 text-xs">
+            <div>
+              <span className="text-slate-500 font-mono block mb-1">Title of the Paper</span>
+              <p className="text-base font-extrabold text-slate-900 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                {registration?.title || registration?.paperTitle || 'AI-driven Smart Green Technology Optimization'}
+              </p>
+            </div>
+
+            <div>
+              <span className="text-slate-500 font-mono block mb-1">Uniqueness / Methodology Abstract</span>
+              <p className="text-xs text-slate-800 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-200 whitespace-pre-wrap">
+                {registration?.abstract || registration?.uniqueness || 'No detailed abstract provided.'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <span className="text-[10px] text-slate-500 font-mono uppercase block">Conference Track Category</span>
+                <p className="font-bold text-slate-900 text-xs mt-1">
+                  {registration?.conferenceTrack || registration?.paperCategory || 'T1 – Green Technology in Artificial Intelligence'}
+                </p>
+              </div>
+
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <span className="text-[10px] text-slate-500 font-mono uppercase block">Sub-Category Domain</span>
+                <p className="font-bold text-slate-900 text-xs mt-1">
+                  {registration?.paperSubCategory || registration?.keywords?.[0] || 'AI for Climate Change Prediction'}
+                </p>
+              </div>
+            </div>
+
+            {/* Paper File Preview / Download */}
+            {registration?.fileUrl && (
+              <div className="pt-2 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => downloadPaperPdf(registration.fileUrl, registration?.title || 'NEXUS_2026_Research_Paper')}
+                  className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-bold transition shadow-lg shadow-emerald-600/20 text-xs cursor-pointer"
+                >
+                  <Download className="w-4 h-4" /> Download Submitted Research Paper PDF
+                </button>
               </div>
             )}
           </div>
-        )}
-
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Activity Timeline</h3>
-          <TeamTimeline teamId={team._id} />
         </div>
-      </div>
 
+        {/* ── Conference Event Timeline ────────────────────────────────────── */}
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+            <Calendar className="w-5 h-5 text-emerald-600" /> Event Timeline & Key Schedule
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs text-slate-700 font-sans">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono uppercase">Step 1</span>
+              <p className="font-bold text-slate-900 mt-1">Registration Opens</p>
+              <p className="text-[11px] text-slate-500 font-mono">06-08-2026</p>
+            </div>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono uppercase">Step 2</span>
+              <p className="font-bold text-slate-900 mt-1">Submission Deadline</p>
+              <p className="text-[11px] text-slate-500 font-mono">31-AUG-2026</p>
+            </div>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono uppercase">Step 3</span>
+              <p className="font-bold text-slate-900 mt-1">Round 2 Evaluation</p>
+              <p className="text-[11px] text-slate-500 font-mono">05 SEP – 07 SEP 2026</p>
+            </div>
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-1">
+              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono uppercase">Final Round</span>
+              <p className="font-bold text-slate-900 mt-1">Offline Presentation</p>
+              <p className="text-[11px] text-emerald-700 font-mono font-bold">12 SEP 2026 @ HIET</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 };

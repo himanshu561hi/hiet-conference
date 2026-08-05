@@ -27,7 +27,7 @@ export const OrganizingCommittee = () => {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {committeeData.organizingCommittee.map(member => (
+          {(committeeData.organizingCommittee || []).map(member => (
             <CommitteeCard key={member.id} member={member} />
           ))}
         </motion.div>

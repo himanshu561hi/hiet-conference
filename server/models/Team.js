@@ -34,6 +34,12 @@ const teamSchema = new mongoose.Schema({
       ref: 'User'
     },
     userId: String,
+    name: String,
+    email: String,
+    mobile: String,
+    college: String,
+    branch: String,
+    year: String,
     joinedAt: {
       type: Date,
       default: Date.now

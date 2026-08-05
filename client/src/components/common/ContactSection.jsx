@@ -1,135 +1,221 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, Phone, Globe, MessageSquare, Copy, Check, AtSign, Share2 } from 'lucide-react';
-import { contactData } from '../../data/contacts';
-import { fadeUpVariant, staggerContainer } from '../../animations/sections';
-import { toast } from 'react-hot-toast';
+import { Mail, Phone, MapPin, Globe, MessageCircle, Send, CheckCircle2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export const ContactSection = () => {
-  const [copiedKey, setCopiedKey] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    reason: '',
+    description: ''
+  });
 
-  const copyToClipboard = (text, keyLabel) => {
-    navigator.clipboard.writeText(text);
-    setCopiedKey(keyLabel);
-    toast.success(`Copied ${keyLabel} to clipboard!`);
-    setTimeout(() => setCopiedKey(null), 2000);
+  const handleSubmit = (e) => {
+    // Form action natively posts to getform.io or handles submission
+    setSubmitted(true);
+    toast.success('Your message has been submitted!');
   };
 
-  const contactCards = [
-    { key: 'Email', label: 'Email Address', value: contactData.conferenceEmail, link: `mailto:${contactData.conferenceEmail}`, icon: Mail, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-    { key: 'Website', label: 'Official Portal', value: 'hiet-nexus.netlify.app', link: 'https://hiet-nexus.netlify.app/', icon: Globe, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-    { key: 'Instagram', label: 'Instagram Handle', value: '@hiet.techfusion', link: 'https://www.instagram.com/hiet.techfusion/', icon: AtSign, color: 'text-pink-600 bg-pink-50 border-pink-200' },
-    { key: 'LinkedIn', label: 'LinkedIn Page', value: 'hiet-techfusion', link: 'https://www.linkedin.com/company/hiet-techfusion/', icon: Share2, color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
-  ];
-
   return (
-    <section id="contact" className="py-20 md:py-28 bg-gradient-to-b from-white via-slate-50/60 to-white relative overflow-hidden">
-      {/* Background ambient lighting */}
-      <div className="absolute -top-32 right-1/4 w-80 h-80 bg-emerald-400/10 rounded-full blur-[130px] pointer-events-none" />
+    <section id="contact" className="py-20 bg-slate-50 text-slate-800 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <span className="text-xs font-bold font-mono uppercase tracking-widest text-emerald-800 bg-emerald-100 border border-emerald-300 px-3.5 py-1 rounded-full shadow-sm">
+            Contact Support & Enquiries
+          </span>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mt-4 mb-4">
+            Connect With NEXUS 2026 Team
+          </h2>
+          <p className="text-slate-600 text-base">
+            Have questions about paper submission, tracks, timeline, or participation? We're here to support you.
+          </p>
+        </div>
 
-      <div className="container mx-auto px-4 md:px-6 max-w-6xl relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        {/* ── Two Column Layout ────────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           
-          {/* Left Column: Primary Contact Info */}
-          <motion.div
-            className="lg:col-span-5"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <motion.span variants={fadeUpVariant} className="inline-block px-3.5 py-1 rounded-full bg-emerald-100/80 border border-emerald-200 text-emerald-800 text-xs font-bold tracking-widest uppercase mb-3">
-              Reach Out
-            </motion.span>
-            <motion.h2 variants={fadeUpVariant} className="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
-              Get in Touch
-            </motion.h2>
-            <motion.p variants={fadeUpVariant} className="text-base text-slate-600 mb-8 font-medium leading-relaxed">
-              Have questions about paper submission formatting, track guidelines, or event schedule? Click any card below to copy details directly!
-            </motion.p>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {contactCards.map((card) => {
-                const Icon = card.icon;
-                const isCopied = copiedKey === card.key;
-                return (
-                  <motion.a 
-                    key={card.key}
-                    href={card.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    variants={fadeUpVariant}
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                    onClick={(e) => {
-                      copyToClipboard(card.value, card.key);
-                    }}
-                    className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-lg hover:border-emerald-500/40 transition-all duration-300 group flex flex-col justify-between"
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${card.color}`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      {isCopied ? (
-                        <Check className="w-4 h-4 text-emerald-600" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
-                      )}
-                    </div>
+          {/* ── Left Column: Contact Links & Info ───────────────────────────── */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 space-y-8 shadow-xl flex flex-col justify-between">
+            <div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">Get in Touch</h3>
+              <p className="text-sm text-slate-600 mb-8">Reach out directly to our organizing committee members and student coordinators.</p>
 
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-sm">{card.label}</h4>
-                      <p className="text-slate-600 text-xs font-semibold truncate mt-0.5 group-hover:text-emerald-700 transition-colors">{card.value}</p>
-                    </div>
-                  </motion.a>
-                );
-              })}
-            </div>
-          </motion.div>
-
-          {/* Right Column: Event Coordinators */}
-          <motion.div
-            className="lg:col-span-7 bg-white p-8 md:p-10 rounded-3xl border border-slate-200/90 shadow-md"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
-              <div>
-                <h3 className="text-2xl font-extrabold text-slate-900">Event Coordinators</h3>
-                <p className="text-xs font-semibold text-slate-500 mt-1">Direct points of contact for competition queries</p>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                <MessageSquare className="w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {contactData.coordinators.map(coordinator => (
-                <motion.div 
-                  key={coordinator.id}
-                  variants={fadeUpVariant}
-                  onClick={() => copyToClipboard(coordinator.phone, coordinator.name)}
-                  className="cursor-pointer bg-slate-50/80 border border-slate-200/70 rounded-2xl p-5 hover:bg-white hover:border-emerald-400/50 hover:shadow-md transition-all duration-300 group"
+              <div className="space-y-6">
+                {/* LinkedIn */}
+                <a
+                  href="https://www.linkedin.com/company/hiet-techfusion/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group"
                 >
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <h4 className="text-base font-bold text-slate-900">{coordinator.name}</h4>
-                    <Copy className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-500 transition-colors" />
+                  <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg group-hover:bg-emerald-600 group-hover:text-white transition">
+                    in
                   </div>
-                  <p className="text-xs font-bold text-emerald-700 mb-3">{coordinator.role}</p>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 px-3 py-1.5 rounded-lg w-fit">
-                    <Phone className="w-3.5 h-3.5 text-slate-500" />
-                    <span>{coordinator.phone}</span>
+                  <div>
+                    <span className="text-xs text-slate-500 uppercase font-mono font-bold block">LinkedIn Page</span>
+                    <span className="text-sm font-bold text-slate-900">hiet-techfusion</span>
                   </div>
-                </motion.div>
-              ))}
+                </a>
+
+                {/* Email */}
+                <a
+                  href="mailto:techfusion9560@gmail.com"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 transition group"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg group-hover:bg-emerald-600 group-hover:text-white transition">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs text-slate-500 uppercase font-mono font-bold block">Email Support</span>
+                    <span className="text-sm font-bold text-slate-900">techfusion9560@gmail.com</span>
+                  </div>
+                </a>
+
+                {/* Phone Coordinators */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                  <span className="text-xs text-slate-500 uppercase font-mono font-bold block">Student Coordinators (Call / WhatsApp)</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="bg-white p-3 rounded-xl border border-slate-200">
+                      <p className="font-bold text-slate-900">Aman Gupta</p>
+                      <p className="text-emerald-700 font-mono font-bold mt-0.5">+91 95603 89835</p>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-slate-200">
+                      <p className="font-bold text-slate-900">Anshu</p>
+                      <p className="text-emerald-700 font-mono font-bold mt-0.5">+91 93106 43257</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
             </div>
-          </motion.div>
+
+            <div className="pt-6 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-500">
+              <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>HIET Campus, Ghaziabad, Uttar Pradesh — 201015</span>
+            </div>
+          </div>
+
+          {/* ── Right Column: Query Submission Form (Getform.io) ─────────────── */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold text-slate-900">Submit Your Query</h3>
+              <p className="text-sm text-slate-600 mt-1">Fill out the form below. Your message will be sent directly to our support team.</p>
+            </div>
+
+            <form
+              action="https://getform.io/f/bvnngjeb"
+              method="POST"
+              onSubmit={handleSubmit}
+              className="space-y-4 text-left"
+            >
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Your Full Name *</label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g. Rahul Sharma"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-600 transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address *</label>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="name@domain.com"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-600 transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Query Subject / Reason *</label>
+                <select
+                  name="reason"
+                  required
+                  value={formData.reason}
+                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-600 transition"
+                >
+                  <option value="">Select Reason...</option>
+                  <option value="Registration Issues">Registration Issues</option>
+                  <option value="Paper Formatting Query">Paper Formatting Query</option>
+                  <option value="Track Category Clarification">Track Category Clarification</option>
+                  <option value="Schedule & Presentation">Schedule & Presentation</option>
+                  <option value="Other Enquiries">Other Enquiries</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Detailed Description *</label>
+                <textarea
+                  name="description"
+                  rows={4}
+                  required
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Describe your question or request in detail..."
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-600 transition"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2"
+              >
+                <Send className="w-4 h-4" />
+                Submit Query
+              </button>
+            </form>
+          </div>
 
         </div>
+
+        {/* ── Below Section: Interactive Google Map of HIET Ghaziabad ─────── */}
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <MapPin className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">HIET Ghaziabad Campus Location Map</h3>
+                <p className="text-xs text-slate-600">Offline Final Round Venue — 12th September 2026</p>
+              </div>
+            </div>
+            <a
+              href="https://maps.google.com/?q=Hi-Tech+Institute+of+Engineering+and+Technology+Ghaziabad"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold text-emerald-700 hover:underline"
+            >
+              Open in Google Maps App →
+            </a>
+          </div>
+
+          <div className="w-full h-80 rounded-2xl overflow-hidden border border-slate-200">
+            <iframe
+              title="HIET Ghaziabad Location Map"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3498.4237190875416!2d77.49503457632612!3d28.676948982397123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cf2f70743f053%3A0xb366b6c0032a1062!2sHi-Tech%20Institute%20of%20Engineering%20%26%20Technology!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        </div>
+
       </div>
     </section>
   );
 };
-
-

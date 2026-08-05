@@ -30,7 +30,6 @@ export const HeroSection = () => {
         <div className="absolute top-10 left-10 w-96 h-96 rounded-full bg-blue-400/10 blur-[130px] animate-float" />
         <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-emerald-400/10 blur-[130px] animate-float" style={{ animationDelay: '2.5s' }} />
 
-        {/* Abstract Technology Grid */}
         <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="hero-pattern" width="48" height="48" patternUnits="userSpaceOnUse">
@@ -66,21 +65,21 @@ export const HeroSection = () => {
 
             {/* Subtitle */}
             <h2 className="text-xl sm:text-2xl font-bold text-slate-700 mb-3 tracking-tight">
-              Pre-Conference Research Paper Writing Competition
+              {hero.subtitle}
             </h2>
 
-            {/* Tagline */}
-            <p className="text-base sm:text-lg text-primary font-bold tracking-wide mb-8 bg-emerald-50/80 border border-emerald-200/80 px-4.5 py-1.5 rounded-full">
-              Research • Write • Connect • Publish
+            {/* Description */}
+            <p className="text-base sm:text-lg text-slate-600 mb-8 max-w-2xl font-medium leading-relaxed">
+              {hero.description || hero.tagline || 'Organized by Tech Fusion, The Official Technical Club of HIET, Ghaziabad.'}
             </p>
 
-            {/* Quick Feature Chips */}
-            <div className="flex flex-wrap items-center gap-2.5 mb-10">
+            {/* Feature Chips */}
+            <div className="flex flex-wrap gap-2.5 mb-8">
               {featureChips.map((chip, idx) => {
                 const Icon = chip.icon;
                 return (
                   <span 
-                    key={idx}
+                    key={idx} 
                     className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-bold shadow-2xs ${chip.color}`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -90,84 +89,106 @@ export const HeroSection = () => {
               })}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-4 mb-10 w-full sm:w-auto">
+            {/* Call to Actions */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto mb-10">
               <Link to="/register" className="w-full sm:w-auto">
-                <Button variant="primary" size="lg" className="w-full sm:w-auto text-base font-bold px-8 h-13 rounded-2xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 group">
-                  Register Now <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <Button 
+                  variant="primary" 
+                  size="lg" 
+                  className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 h-13 rounded-2xl shadow-lg shadow-emerald-600/25 transition-all duration-300 flex items-center justify-center gap-2 group text-base"
+                >
+                  {hero.primaryCta || hero.cta?.primary || 'Register Now'}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
 
               <a 
-                href="/assets/documents/nexus-2026-brochure.pdf" 
+                href={hero.secondaryUrl || hero.cta?.secondaryUrl || "/brochure.pdf"} 
                 target="_blank" 
-                rel="noreferrer"
+                rel="noopener noreferrer" 
                 className="w-full sm:w-auto"
               >
-                <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white border-slate-300 hover:border-slate-400 text-slate-800 text-base font-semibold px-6 h-13 rounded-2xl flex items-center justify-center gap-2">
-                  <Download className="w-4 h-4 text-blue-600" /> Download Brochure
-                </Button>
-              </a>
-
-              <a href="#tracks" className="w-full sm:w-auto">
-                <Button variant="ghost" size="lg" className="w-full sm:w-auto text-slate-600 hover:text-slate-900 text-base font-semibold px-5 h-13 rounded-2xl">
-                  View Guidelines
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full sm:w-auto bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 font-bold px-7 h-13 rounded-2xl shadow-sm transition-all duration-300 flex items-center justify-center gap-2 text-base"
+                >
+                  <Download className="w-4 h-4 text-emerald-600" />
+                  {hero.secondaryCta || hero.cta?.secondary || 'Download Brochure'}
                 </Button>
               </a>
             </div>
 
-            {/* Countdown Banner */}
-            <div className="w-full max-w-2xl">
-              <Countdown targetDate={countdown.targetDate} title={countdown.title} />
+            {/* Partner Logos Row */}
+            <div className="pt-6 border-t border-slate-200/80 w-full">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">
+                In Academic Association With
+              </p>
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                {supportingLogos.map((logo, idx) => (
+                  <div 
+                    key={idx} 
+                    className="h-10 sm:h-12 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs flex items-center gap-2"
+                  >
+                    <img src={logo.src} alt={logo.alt} className="max-h-full max-w-[80px] object-contain" />
+                    <span className="text-[10px] font-bold text-slate-600 font-mono hidden sm:inline-block">
+                      {logo.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
 
           </motion.div>
 
-          {/* Right Column: Hero Event Logo (Fixed in hero with float animation, no scroll-jacking) */}
+          {/* Right Column: Countdown Card */}
           <motion.div 
-            className="lg:col-span-5 flex flex-col items-center justify-center relative"
+            className="lg:col-span-5 flex flex-col justify-center"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="absolute w-72 h-72 rounded-full bg-gradient-to-tr from-blue-500/15 via-emerald-500/15 to-indigo-500/15 blur-3xl" />
-            
-            <div className="relative z-10 w-72 sm:w-80 lg:w-96 h-72 sm:h-80 lg:h-96 bg-white border border-slate-200/90 rounded-3xl p-8 shadow-xl shadow-slate-200/70 flex items-center justify-center animate-float">
-              <img 
-                src="/eventlogo.png" 
-                alt="NEXUS 2026 Official Logo" 
-                className="max-h-full max-w-full object-contain filter drop-shadow-md"
-              />
+            <div className="relative">
+              {/* Outer Decorative Ring */}
+              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 opacity-30 blur-lg" />
+              
+              <div className="relative bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+                
+                {/* Event Schedule Info Box */}
+                <div className="flex items-center justify-between border-b border-slate-100 pb-5">
+                  <div>
+                    <span className="text-[11px] font-bold font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full uppercase">
+                      Event Date & Venue
+                    </span>
+                    <h3 className="text-lg font-black text-slate-900 mt-2">12th September 2026</h3>
+                    <p className="text-xs text-slate-500 font-medium">HIET Campus, Ghaziabad (UP)</p>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-100/80 text-emerald-700 flex items-center justify-center font-black text-xl shadow-inner shrink-0">
+                    🏆
+                  </div>
+                </div>
+
+                {/* Live Countdown Component */}
+                <Countdown targetDate="2026-09-12T00:00:00Z" title={countdown.title} />
+
+                {/* Key Event Highlights */}
+                <div className="space-y-2.5 pt-2">
+                  <div className="flex items-center gap-2.5 text-xs text-slate-700 font-medium bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                    <Award className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Cash Prizes & Certificates for Top Research Papers</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-slate-700 font-medium bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                    <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+                    <span>Double-blind Peer Review by Expert Panel</span>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </motion.div>
 
         </div>
-
-        {/* Supporting Partners & Club Banner (eventlogo, edulogo, clublogo) */}
-        <div className="mt-16 pt-8 border-t border-slate-200/70 w-full">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center mb-6">
-            Organized By Tech Fusion Club & Academic Partners
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-            {supportingLogos.map((logo, idx) => (
-              <div 
-                key={idx}
-                className="bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md hover:border-emerald-500/40 flex items-center justify-center h-16 w-36 sm:w-44 hover:-translate-y-1 transition-all duration-300 group"
-              >
-                <img 
-                  src={logo.src} 
-                  alt={logo.alt} 
-                  className="max-h-full max-w-full object-contain filter group-hover:brightness-105 transition-all"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
       </div>
     </section>
   );
 };
-
-
-

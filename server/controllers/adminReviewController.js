@@ -257,3 +257,98 @@ exports.getReviewHistory = async (req, res) => {
     return sendError(res, 500, 'ADM_013', 'Failed to fetch history', null, req);
   }
 };
+
+// @desc    Update registration status (Under Review, Under Hold, Accepted, Rejected)
+// @route   POST /api/v1/admin/registration/:id/status
+// @access  Private/Admin/Editorial
+exports.updateRegistrationStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, rejectionReason } = req.body;
+
+    const validStatuses = ['Submitted', 'Under Review', 'Under Hold', 'Accepted', 'Approved', 'Rejected'];
+    if (!status || !validStatuses.includes(status)) {
+      return sendError(res, 400, 'ADM_030', 'Invalid status provided', null, req);
+    }
+
+    const registration = await Registration.findById(id).populate({
+      path: 'team',
+      populate: [
+        { path: 'leader', select: 'fullName email mobile' },
+        { path: 'members.user', select: 'fullName email mobile' }
+      ]
+    });
+
+    if (!registration) {
+      return sendError(res, 404, 'ADM_031', 'Registration not found', null, req);
+    }
+
+    // Rule 1: Mentor Lock / Hold Constraint
+    if (registration.status === 'Under Hold' && registration.heldBy) {
+      const isOwner = registration.heldBy.toString() === req.user._id.toString();
+      const isAdmin = req.user.role === 'admin';
+      if (!isOwner && !isAdmin) {
+        return sendError(
+          res, 
+          403, 
+          'ADM_032', 
+          `This application is currently on hold by mentor (${registration.heldByName || 'another faculty'}). Only the assigned mentor or Admin can modify its status.`, 
+          null, 
+          req
+        );
+      }
+    }
+
+    // Rule 2: Rejection description min 10 words
+    if (status === 'Rejected') {
+      const words = (rejectionReason || '').trim().split(/\s+/).filter(Boolean);
+      if (words.length < 10) {
+        return sendError(
+          res, 
+          400, 
+          'ADM_033', 
+          `Rejection description must contain a minimum of 10 words for clarity (currently ${words.length} words).`, 
+          null, 
+          req
+        );
+      }
+      registration.rejectionReason = rejectionReason;
+    } else if (status !== 'Rejected') {
+      registration.rejectionReason = '';
+    }
+
+    const dbStatus = status === 'Accepted' ? 'Approved' : status;
+
+    // Rule 3: Hold tracking
+    if (dbStatus === 'Under Hold') {
+      registration.heldBy = req.user._id;
+      registration.heldByName = req.user.fullName || req.user.email;
+      registration.heldByEmail = req.user.email;
+    } else {
+      registration.heldBy = null;
+      registration.heldByName = '';
+      registration.heldByEmail = '';
+    }
+
+    registration.status = dbStatus;
+    await registration.save();
+
+    if (registration.team) {
+      registration.team.status = dbStatus;
+      await registration.team.save();
+    }
+
+    await AuditLog.create({
+      user: req.user._id,
+      action: `STATUS_CHANGED_TO_${dbStatus.toUpperCase().replace(/\s+/g, '_')}`,
+      targetId: registration._id.toString()
+    });
+
+    return sendSuccess(res, 200, `Status updated to ${dbStatus} successfully`, { registration }, req);
+
+  } catch (error) {
+    console.error('[Status Update Error]:', error);
+    return sendError(res, 500, 'ADM_034', 'Failed to update status', null, req);
+  }
+};
+

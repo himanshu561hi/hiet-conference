@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 const variants = {
-  primary: 'bg-primary text-white hover:bg-emerald-700 active:bg-emerald-800',
+  primary: 'bg-emerald-800 text-white hover:bg-emerald-900 active:bg-emerald-950 font-bold',
   secondary: 'bg-secondary text-white hover:bg-blue-800 active:bg-blue-900',
   outline: 'border border-primary text-primary hover:bg-emerald-50 active:bg-emerald-100',
   ghost: 'bg-transparent text-text hover:bg-surface active:bg-gray-200',

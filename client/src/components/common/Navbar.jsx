@@ -110,9 +110,9 @@ export const Navbar = () => {
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button variant="primary" className="text-sm font-bold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all flex items-center gap-1.5 px-5 h-10 rounded-xl">
-                    <Sparkles className="w-4 h-4 text-emerald-200" />
-                    Event Registration
+                  <Button variant="primary" className="text-sm font-extrabold bg-emerald-800 hover:bg-emerald-900 text-white shadow-md transition-all flex items-center gap-1.5 px-5 h-10 rounded-xl border border-emerald-700">
+                    <Sparkles className="w-4 h-4 text-white" />
+                    <span className="text-white">Event Registration</span>
                   </Button>
                 </Link>
               </>
@@ -174,9 +174,9 @@ export const Navbar = () => {
                         </Button>
                       </Link>
                       <Link to="/register">
-                        <Button variant="primary" className="w-full justify-center text-base font-bold shadow-md shadow-primary/20 flex items-center justify-center gap-2">
-                          <Sparkles className="w-4 h-4 text-emerald-200" />
-                          Event Registration
+                        <Button variant="primary" className="w-full justify-center text-base font-extrabold bg-emerald-800 hover:bg-emerald-900 text-white shadow-md flex items-center justify-center gap-2 border border-emerald-700">
+                          <Sparkles className="w-4 h-4 text-white" />
+                          <span className="text-white">Event Registration</span>
                         </Button>
                       </Link>
                     </>

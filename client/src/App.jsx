@@ -101,7 +101,7 @@ function App() {
               path="/admin/dashboard" 
               element={
                 <ProtectedRoute adminOnly={true}>
-                  <PageTransition><AdminAnalyticsDashboard /></PageTransition>
+                  <PageTransition><AdminDashboard /></PageTransition>
                 </ProtectedRoute>
               } 
             />

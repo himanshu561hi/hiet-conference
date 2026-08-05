@@ -27,7 +27,7 @@ export const AdvisoryBoard = () => {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {committeeData.advisoryBoard.map(member => (
+          {(committeeData.advisoryBoard || []).map(member => (
             <CommitteeCard key={member.id} member={member} />
           ))}
         </motion.div>

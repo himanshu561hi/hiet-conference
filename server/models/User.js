@@ -41,8 +41,36 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
+    enum: ['user', 'admin', 'editorial'],
     default: 'user'
+  },
+  isStudent: {
+    type: Boolean,
+    default: true
+  },
+  college: {
+    type: String,
+    default: ''
+  },
+  branch: {
+    type: String,
+    default: ''
+  },
+  year: {
+    type: String,
+    default: ''
+  },
+  organizationName: {
+    type: String,
+    default: ''
+  },
+  state: {
+    type: String,
+    default: ''
+  },
+  district: {
+    type: String,
+    default: ''
   }
 }, { timestamps: true });
 

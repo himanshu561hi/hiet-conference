@@ -186,43 +186,65 @@ exports.login = async (req, res) => {
   }
 };
 
-// @desc    Admin Login
+// @desc    Admin / Editorial Login
 // @route   POST /api/v1/auth/admin-login
 // @access  Public
 exports.adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
-      return res.status(401).json({ message: 'Invalid admin credentials' });
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    let adminUser = await User.findOne({ email });
-    if (!adminUser) {
-      adminUser = await User.create({
-        fullName: 'System Administrator',
-        email: process.env.ADMIN_EMAIL,
-        mobile: '0000000000',
-        password: process.env.ADMIN_PASSWORD,
-        role: 'admin',
-        isVerified: true
+    // 1. Check if matching process.env Admin Credentials
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+      let adminUser = await User.findOne({ email }).select('+password');
+      if (!adminUser) {
+        adminUser = await User.create({
+          fullName: 'HOD CSE (Admin)',
+          email: process.env.ADMIN_EMAIL,
+          mobile: '0000000000',
+          password: process.env.ADMIN_PASSWORD,
+          role: 'admin',
+          isVerified: true
+        });
+      } else {
+        adminUser.role = 'admin';
+        adminUser.password = process.env.ADMIN_PASSWORD;
+        await adminUser.save();
+      }
+
+      generateToken(res, adminUser._id);
+
+      return res.status(200).json({
+        _id: adminUser._id,
+        userId: adminUser.userId,
+        fullName: adminUser.fullName,
+        email: adminUser.email,
+        role: adminUser.role
       });
-    } else if (adminUser.role !== 'admin') {
-      adminUser.role = 'admin';
-      await adminUser.save();
     }
 
-    generateToken(res, adminUser._id);
+    // 2. Check for Editorial Members / DB Admin users
+    const user = await User.findOne({ email }).select('+password');
+    if (user && (user.role === 'admin' || user.role === 'editorial')) {
+      const isMatch = await user.comparePassword(password);
+      if (isMatch) {
+        generateToken(res, user._id);
+        return res.status(200).json({
+          _id: user._id,
+          userId: user.userId,
+          fullName: user.fullName,
+          email: user.email,
+          role: user.role
+        });
+      }
+    }
 
-    res.status(200).json({
-      _id: adminUser._id,
-      userId: adminUser.userId,
-      fullName: adminUser.fullName,
-      email: adminUser.email,
-      role: adminUser.role
-    });
+    return res.status(401).json({ message: 'Invalid admin or editorial credentials' });
   } catch (error) {
-    console.error('[Admin Login Error]:', error);
+    console.error('[Admin/Editorial Login Error]:', error);
     res.status(500).json({ message: 'Server Error' });
   }
 };

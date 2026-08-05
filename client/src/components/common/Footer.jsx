@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, ArrowUp, Sparkles } from 'lucide-react';
-import { brandingConfig } from '../../config/branding';
+import { ArrowUpRight, ArrowUp, Mail, Globe, MessageCircle, MapPin, ShieldCheck } from 'lucide-react';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -17,125 +16,94 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="bg-slate-900 text-white pt-16 pb-10 border-t border-slate-800 relative overflow-hidden">
-      {/* Glow highlight */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
-      
-      <div className="container mx-auto px-4 md:px-6">
-        {/* Footer Partner Logos Row */}
-        <div className="mb-14 pb-10 border-b border-slate-800">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center mb-6">
-            Institutional & Conference Partners
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-            {logos.map((logo, index) => (
-              <div 
-                key={index}
-                className="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-700 shadow-sm flex items-center justify-center h-14 sm:h-16 w-32 sm:w-40 hover:border-emerald-500/60 hover:scale-105 transition-all duration-300"
-              >
-                <img 
-                  src={logo.src} 
-                  alt={logo.alt} 
-                  className="max-h-full max-w-full object-contain filter hover:brightness-105 transition-all"
-                />
+    <footer className="bg-white border-t border-slate-200 text-slate-700 py-12 font-sans relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Partner Logos Row */}
+        <div className="flex flex-wrap items-center justify-between gap-6 pb-10 border-b border-slate-100">
+          <div>
+            <span className="text-xs font-bold font-mono uppercase text-emerald-800 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full">
+              NEXUS 2026 Official Partners
+            </span>
+            <p className="text-xs text-slate-500 mt-1.5">Organized by HIET Ghaziabad & Tech Fusion Student Club</p>
+          </div>
+
+          <div className="flex items-center gap-6">
+            {logos.map((logo, idx) => (
+              <div key={idx} className="h-12 bg-slate-50 border border-slate-200 rounded-xl p-2 flex items-center justify-center shadow-sm">
+                <img src={logo.src} alt={logo.alt} className="max-h-full max-w-full object-contain" />
               </div>
             ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 mb-14">
-          
-          {/* Brand Info */}
-          <div className="lg:col-span-1 flex flex-col items-start">
-            <Link to="/" className="text-2xl font-black tracking-tight mb-4 flex items-center gap-2">
-              NEXUS<span className="text-primary font-bold">2026</span>
-            </Link>
-            <p className="text-slate-400 text-sm leading-relaxed mb-6">
-              {brandingConfig.tagline}
+        {/* Links Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-10">
+          <div>
+            <h4 className="text-base font-extrabold text-slate-900 mb-3">NEXUS 2026</h4>
+            <p className="text-xs text-slate-600 leading-relaxed mb-4">
+              International Conference & Research Paper Writing Competition on Green Technologies & Intelligent Systems.
             </p>
-            <div className="text-slate-500 text-[11px] font-bold uppercase tracking-wider mb-1">
-              Organized By
-            </div>
-            <div className="font-bold text-slate-200 text-sm">
-              {brandingConfig.organization.name}
-            </div>
-            <div className="text-xs text-slate-400">
-              {brandingConfig.organization.club}
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-lg">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> 100% Free Author Registration
             </div>
           </div>
 
-          {/* Navigation Links */}
           <div>
-            <h4 className="text-white font-bold text-base mb-5 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-primary" /> Navigation
-            </h4>
-            <ul className="space-y-3 text-slate-400 text-sm font-medium">
-              <li><a href="#home" className="hover:text-primary transition-colors">Home</a></li>
-              <li><a href="#timeline" className="hover:text-primary transition-colors">Timeline</a></li>
-              <li><a href="#tracks" className="hover:text-primary transition-colors">Conference Tracks</a></li>
-              <li><a href="#contact" className="hover:text-primary transition-colors">Contact Us</a></li>
-              <li><Link to="/register" className="text-primary hover:underline flex items-center gap-1 font-semibold"><Sparkles className="w-3.5 h-3.5" /> Event Registration</Link></li>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3 font-mono">Quick Navigation</h4>
+            <ul className="space-y-2 text-xs">
+              <li><a href="#about" className="hover:text-emerald-600 transition">About Conference</a></li>
+              <li><a href="#tracks" className="hover:text-emerald-600 transition">Research Tracks</a></li>
+              <li><a href="#dates" className="hover:text-emerald-600 transition">Important Dates</a></li>
+              <li><a href="#committee" className="hover:text-emerald-600 transition">Editorial Board</a></li>
+              <li><Link to="/register" className="text-emerald-700 font-bold hover:underline">Submit Paper PDF →</Link></li>
             </ul>
           </div>
 
-          {/* Competition Resources */}
           <div>
-            <h4 className="text-white font-bold text-base mb-5 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500" /> Competition Info
-            </h4>
-            <ul className="space-y-3 text-slate-400 text-sm font-medium">
-              <li>
-                <a href="#timeline" className="hover:text-primary transition-colors inline-flex items-center gap-1">
-                  Submission Deadlines
-                </a>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3 font-mono">Conference Tracks</h4>
+            <ul className="space-y-2 text-xs">
+              <li><span className="text-slate-600">Track 1: Green AI & Systems</span></li>
+              <li><span className="text-slate-600">Track 2: Renewable Energy Tech</span></li>
+              <li><span className="text-slate-600">Track 3: Smart Cities & IoT</span></li>
+              <li><span className="text-slate-600">Track 4: Eco Green Materials</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3 font-mono">Contact & Venue</h4>
+            <ul className="space-y-2.5 text-xs text-slate-600">
+              <li className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-emerald-600 shrink-0" />
+                <a href="mailto:techfusion9560@gmail.com" className="hover:text-emerald-600">techfusion9560@gmail.com</a>
               </li>
-              <li><a href="#tracks" className="hover:text-primary transition-colors">Research Categories</a></li>
-              <li><Link to="/auth/login" className="hover:text-primary transition-colors">Author Portal Login</Link></li>
+              <li className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-blue-600 shrink-0" />
+                <a href="https://www.linkedin.com/company/hiet-techfusion/" target="_blank" rel="noreferrer" className="hover:text-slate-900 font-medium">Tech Fusion LinkedIn Page</a>
+              </li>
+              <li className="flex items-start gap-2 pt-1">
+                <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <span>HIET Campus, Ghaziabad, UP 201015</span>
+              </li>
             </ul>
           </div>
-
-          {/* Social Links */}
-          <div>
-            <h4 className="text-white font-bold text-base mb-5 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-teal-400" /> Connect
-            </h4>
-            <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-              Stay updated with call for paper notifications and acceptance announcements.
-            </p>
-            <div className="flex flex-wrap items-center gap-2">
-              {Object.entries(brandingConfig.socialLinks).map(([platform, link]) => (
-                <a 
-                  key={platform} 
-                  href={link} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-emerald-600 hover:text-white transition-all capitalize text-xs font-bold border border-slate-700/80 flex items-center gap-1"
-                >
-                  {platform}
-                </a>
-              ))}
-            </div>
-          </div>
-
         </div>
 
         {/* Copyright & Scroll Top */}
-        <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-slate-500 text-xs font-medium text-center sm:text-left">
-            &copy; {currentYear} {brandingConfig.appName}. Research Paper Writing Competition. All rights reserved.
-          </p>
+        <div className="pt-6 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <p>&copy; {currentYear} NEXUS 2026 — HIET Ghaziabad. All rights reserved.</p>
           <button 
             onClick={scrollToTop}
-            className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-primary transition-colors focus:outline-none group"
+            className="flex items-center gap-2 text-slate-600 hover:text-emerald-600 transition-colors font-semibold"
           >
             Back to top
-            <div className="w-8 h-8 rounded-full bg-slate-800 group-hover:bg-primary group-hover:text-white flex items-center justify-center transition-all">
-              <ArrowUp className="w-4 h-4" />
+            <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
+              <ArrowUp className="w-3.5 h-3.5" />
             </div>
           </button>
         </div>
+
       </div>
     </footer>
   );
 };
-

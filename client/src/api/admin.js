@@ -62,5 +62,10 @@ export const adminApi = {
       responseType: 'blob'
     });
     return response.data;
+  },
+
+  updateStatus: async (id, status, rejectionReason = '') => {
+    const response = await api.post(`/v1/admin/registration/${id}/status`, { status, rejectionReason });
+    return response.data;
   }
 };
