@@ -8,4 +8,23 @@ const api = axios.create({
   },
 });
 
+// Request interceptor to attach Bearer token from localStorage for cross-domain calls (Netlify -> Vercel)
+api.interceptors.request.use(
+  (config) => {
+    try {
+      const storedUser = localStorage.getItem('nexus_user');
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser?.token) {
+          config.headers.Authorization = `Bearer ${parsedUser.token}`;
+        }
+      }
+    } catch (error) {
+      console.error('Error attaching token in request interceptor:', error);
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 export default api;

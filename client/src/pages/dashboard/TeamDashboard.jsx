@@ -129,6 +129,33 @@ export const TeamDashboard = () => {
           </a>
         </div>
 
+        {/* Missing Session Token / Disconnected DB Alert */}
+        {(!team && !registration) && (
+          <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-6 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-200 text-amber-800 flex items-center justify-center text-2xl shrink-0">
+                🔄
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-extrabold text-amber-950">Session Token Upgrade Required</h3>
+                <p className="text-xs text-amber-900/90 leading-relaxed font-medium">
+                  We upgraded our security to support seamless cross-domain connections between Netlify and Vercel. If your team academic details or uploaded paper appear as defaults or "N/A", your current session token is outdated.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
+              className="shrink-0 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold px-6 py-3 rounded-2xl transition shadow-lg text-xs cursor-pointer"
+            >
+              Log Out & Re-Login to View DB Data →
+            </button>
+          </div>
+        )}
+
         {/* Read-Only Banner Notice */}
         <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-3">

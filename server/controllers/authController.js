@@ -94,7 +94,7 @@ exports.verifyEmail = async (req, res) => {
     await user.save();
 
     // Auto Login after verification
-    generateToken(res, user._id);
+    const token = generateToken(res, user._id);
 
     res.status(200).json({
       message: 'Email verified successfully',
@@ -102,6 +102,7 @@ exports.verifyEmail = async (req, res) => {
       userId: user.userId,
       fullName: user.fullName,
       email: user.email,
+      token,
     });
   } catch (error) {
     console.error(error);
@@ -171,14 +172,15 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    generateToken(res, user._id);
+    const token = generateToken(res, user._id);
 
     res.status(200).json({
       _id: user._id,
       userId: user.userId,
       fullName: user.fullName,
       email: user.email,
-      role: user.role
+      role: user.role,
+      token,
     });
   } catch (error) {
     console.error(error);
@@ -215,14 +217,15 @@ exports.adminLogin = async (req, res) => {
         await adminUser.save();
       }
 
-      generateToken(res, adminUser._id);
+      const token = generateToken(res, adminUser._id);
 
       return res.status(200).json({
         _id: adminUser._id,
         userId: adminUser.userId,
         fullName: adminUser.fullName,
         email: adminUser.email,
-        role: adminUser.role
+        role: adminUser.role,
+        token,
       });
     }
 
@@ -231,13 +234,14 @@ exports.adminLogin = async (req, res) => {
     if (user && (user.role === 'admin' || user.role === 'editorial')) {
       const isMatch = await user.comparePassword(password);
       if (isMatch) {
-        generateToken(res, user._id);
+        const token = generateToken(res, user._id);
         return res.status(200).json({
           _id: user._id,
           userId: user.userId,
           fullName: user.fullName,
           email: user.email,
-          role: user.role
+          role: user.role,
+          token,
         });
       }
     }

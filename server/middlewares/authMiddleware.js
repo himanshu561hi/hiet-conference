@@ -4,8 +4,12 @@ const User = require('../models/User');
 const protect = async (req, res, next) => {
   let token;
 
-  // Read the JWT from the cookie
-  token = req.cookies.jwt;
+  // Check Authorization Bearer header first (essential for cross-domain Netlify -> Vercel calls), then cookie
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
 
   if (token) {
     try {

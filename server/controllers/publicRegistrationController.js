@@ -439,10 +439,10 @@ exports.publicRegister = async (req, res) => {
       }
     }
 
-    // ── Step 6: Auto-login the leader (set JWT cookie) ────────────────────
+    // ── Step 6: Auto-login the leader (set JWT cookie & return token) ─────
 
     const generateToken = require('../utils/generateToken');
-    generateToken(res, leaderUser._id);
+    const token = generateToken(res, leaderUser._id);
 
     // ── Step 7: Respond ────────────────────────────────────────────────────
 
@@ -454,6 +454,7 @@ exports.publicRegister = async (req, res) => {
         fullName: leaderUser.fullName,
         email: leaderUser.email,
         role: leaderUser.role,
+        token,
       },
       team: {
         id: team._id,
