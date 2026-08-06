@@ -24,7 +24,7 @@ const sendEmail = async (options) => {
       transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
-        secure: process.env.SMTP_PORT === '465',
+        secure: process.env.SMTP_PORT === '465' || Number(process.env.SMTP_PORT) === 465,
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS,
@@ -32,8 +32,9 @@ const sendEmail = async (options) => {
       });
     }
 
+    const senderEmail = process.env.FROM_EMAIL || process.env.SMTP_USER || 'support@nexus2026.com';
     const mailOptions = {
-      from: `"${process.env.FROM_NAME || 'NEXUS 2026'}" <${process.env.FROM_EMAIL || 'support@nexus2026.com'}>`,
+      from: `"${process.env.FROM_NAME || 'NEXUS 2026'}" <${senderEmail}>`,
       to: options.email,
       subject: options.subject,
       html: options.html,

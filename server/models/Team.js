@@ -28,6 +28,18 @@ const teamSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  institute: {
+    type: String,
+    default: ''
+  },
+  state: {
+    type: String,
+    default: ''
+  },
+  district: {
+    type: String,
+    default: ''
+  },
   members: [{
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -40,6 +52,10 @@ const teamSchema = new mongoose.Schema({
     college: String,
     branch: String,
     year: String,
+    organizationName: String,
+    state: String,
+    district: String,
+    isStudent: Boolean,
     joinedAt: {
       type: Date,
       default: Date.now

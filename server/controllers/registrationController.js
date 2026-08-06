@@ -7,7 +7,10 @@ const { sendSuccess, sendError } = require('../utils/responseHelpers');
  * (Since teams are deeply integrated, we determine the active team for the user here)
  */
 const requireLeader = async (req, res) => {
-  const team = await Team.findOne({ members: { $elemMatch: { user: req.user._id } }, isDeleted: false });
+  const team = await Team.findOne({
+    $or: [{ leader: req.user._id }, { 'members.user': req.user._id }],
+    isDeleted: false
+  });
   if (!team) {
     sendError(res, 404, 'TM_008', 'Team not found', null, req);
     return null;
@@ -20,7 +23,10 @@ const requireLeader = async (req, res) => {
 };
 
 const requireMember = async (req, res) => {
-  const team = await Team.findOne({ members: { $elemMatch: { user: req.user._id } }, isDeleted: false });
+  const team = await Team.findOne({
+    $or: [{ leader: req.user._id }, { 'members.user': req.user._id }],
+    isDeleted: false
+  });
   if (!team) {
     sendError(res, 404, 'TM_008', 'Team not found', null, req);
     return null;

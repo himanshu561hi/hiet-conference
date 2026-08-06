@@ -426,14 +426,11 @@ export function Register() {
     }
     try {
       setSendingOtp(true);
-      const res = await api.post('/v1/public/send-otp', { email: leaderEmail });
+      await api.post('/v1/public/send-otp', { email: leaderEmail });
       setOtpSent(true);
-      toast.success('OTP sent to your email! Please check inbox/spam.');
-      if (res.data?.data?.otp) {
-        toast(`DEV OTP: ${res.data.data.otp}`, { icon: '🔑', duration: 8000 });
-      }
+      toast.success('Alphanumeric verification code sent to your email! Please check inbox and spam folder.');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to send OTP.');
+      toast.error(err.response?.data?.message || 'Failed to send verification code.');
     } finally {
       setSendingOtp(false);
     }
@@ -754,15 +751,15 @@ export function Register() {
                 {/* OTP Input box if OTP sent and not verified yet */}
                 {otpSent && !emailVerified && (
                   <div className="bg-emerald-50/60 border border-emerald-200 p-4 rounded-2xl space-y-3 mt-2">
-                    <p className="text-xs text-slate-700">Enter the 6-digit OTP sent to <strong>{leaderEmail}</strong>:</p>
+                    <p className="text-xs text-slate-700">Enter the 6-character alphanumeric code sent to <strong>{leaderEmail}</strong>:</p>
                     <div className="flex gap-2">
                       <input
                         type="text"
                         maxLength={6}
                         value={otpInput}
-                        onChange={e => setOtpInput(e.target.value)}
-                        placeholder="Enter 6-Digit OTP (e.g. 123456)"
-                        className="flex-1 px-4 py-2 bg-white border border-slate-300 text-center font-mono tracking-widest text-sm text-slate-900 rounded-xl focus:border-emerald-600 outline-none shadow-sm"
+                        onChange={e => setOtpInput(e.target.value.toUpperCase())}
+                        placeholder="6-Char Code (e.g. NX8B4M)"
+                        className="flex-1 px-4 py-2 bg-white border border-slate-300 text-center font-mono uppercase tracking-widest text-sm text-slate-900 rounded-xl focus:border-emerald-600 outline-none shadow-sm"
                       />
                       <button
                         type="button"

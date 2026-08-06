@@ -74,6 +74,14 @@ const registrationSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  uniqueness: {
+    type: String,
+    default: ''
+  },
+  paperSubCategory: {
+    type: String,
+    default: ''
+  },
   theme: {
     type: String,
     default: ''

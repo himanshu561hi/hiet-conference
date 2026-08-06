@@ -46,9 +46,12 @@ exports.createTeam = async (req, res) => {
 exports.getMyTeam = async (req, res) => {
   try {
     const Team = require('../models/Team'); // Inline require to avoid circular deps if any
-    const team = await Team.findOne({ 'members.user': req.user._id, isDeleted: false })
-      .populate('leader', 'fullName email mobile')
-      .populate('members.user', 'fullName email mobile');
+    const team = await Team.findOne({
+      $or: [{ leader: req.user._id }, { 'members.user': req.user._id }],
+      isDeleted: false
+    })
+      .populate('leader', 'fullName email mobile college branch year organizationName state district isStudent')
+      .populate('members.user', 'fullName email mobile college branch year organizationName state district isStudent');
 
     if (!team) {
       return res.status(404).json({

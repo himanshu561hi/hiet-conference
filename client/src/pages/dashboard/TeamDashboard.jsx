@@ -243,7 +243,7 @@ export const TeamDashboard = () => {
                 <div className="flex justify-between">
                   <span className="text-slate-500">College / Org:</span>
                   <span className="font-bold text-slate-900 text-right">
-                    {leaderUser?.college || registration?.collegeName || registration?.institute || team?.institute || (registration?.organizationName ? `Org: ${registration.organizationName}` : null) || 'N/A'}
+                    {leaderUser?.college || leaderUser?.organizationName || registration?.collegeName || registration?.organizationName || team?.institute || 'N/A'}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -284,7 +284,7 @@ export const TeamDashboard = () => {
                 <div className="pt-3 border-t border-slate-200 space-y-1.5 text-xs text-slate-700 font-sans">
                   <div className="flex justify-between">
                     <span className="text-slate-500">College / Org:</span>
-                    <span className="font-bold text-slate-900 text-right">{m.college || m.user?.college || registration?.collegeName || registration?.institute || team?.institute || 'N/A'}</span>
+                    <span className="font-bold text-slate-900 text-right">{m.college || m.organizationName || m.user?.college || m.user?.organizationName || registration?.collegeName || registration?.organizationName || team?.institute || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Branch:</span>
