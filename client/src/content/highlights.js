@@ -28,7 +28,7 @@ export const highlightsContent = {
       { id: "p1", title: "Scopus Indexed", desc: "Ensuring global reach and academic recognition.", icon: "BookMarked" },
       { id: "p2", title: "Bentham Science", desc: "Official publishing partner for outstanding research.", icon: "Library" },
       { id: "p3", title: "Peer Review", desc: "Rigorous double-blind review process by domain experts.", icon: "CheckCircle" },
-      { id: "p4", title: "Hybrid Conference", desc: "Present virtually or physically based on your convenience.", icon: "MonitorSmartphone" }
+      { id: "p4", title: "Offline Conference", desc: "Present your research live in person at the HIET campus.", icon: "Building2" }
     ]
   },
   brochure: {

@@ -5,6 +5,7 @@ import { staggerContainer, fadeUpVariant } from '../../animations/sections';
 export const TrustedBy = () => {
   const logos = [
     { src: '/eventlogo.png', alt: 'NEXUS 2026 Event Logo', label: 'ICDETGT-2026' },
+    { src: '/collegelogo.png', alt: 'HIET College Logo', label: 'HIET Ghaziabad' },
     { src: '/edulogo.jpg', alt: 'Education Partner Logo', label: 'Academic Council' },
     { src: '/clublogo.png', alt: 'Tech Fusion Club Logo', label: 'Tech Fusion HIET' },
   ];
@@ -32,7 +33,7 @@ export const TrustedBy = () => {
                 <img 
                   src={logo.src} 
                   alt={logo.alt} 
-                  className="h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                  className="h-full object-contain transition-all duration-300"
                 />
               </div>
               <span className="text-[11px] font-semibold text-slate-400 group-hover:text-slate-700 transition-colors mt-2">

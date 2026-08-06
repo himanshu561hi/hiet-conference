@@ -18,6 +18,7 @@ export const HeroSection = () => {
 
   const supportingLogos = [
     { src: '/eventlogo.png', alt: 'NEXUS 2026 Event Logo', label: 'ICDETGT-2026' },
+    { src: '/collegelogo.png', alt: 'HIET College Logo', label: 'HIET Ghaziabad' },
     { src: '/edulogo.jpg', alt: 'Education Council Logo', label: 'Academic Council' },
     { src: '/clublogo.png', alt: 'Tech Fusion Club Logo', label: 'Tech Fusion HIET' },
   ];
@@ -124,14 +125,14 @@ export const HeroSection = () => {
               <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">
                 In Academic Association With
               </p>
-              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+              <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 sm:gap-2.5">
                 {supportingLogos.map((logo, idx) => (
                   <div 
                     key={idx} 
-                    className="h-10 sm:h-12 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs flex items-center gap-2"
+                    className="h-10 bg-white px-2.5 py-1.5 rounded-xl border border-slate-200 shadow-2xs flex items-center gap-1.5 shrink-0 hover:border-emerald-300 transition-colors"
                   >
-                    <img src={logo.src} alt={logo.alt} className="max-h-full max-w-[80px] object-contain" />
-                    <span className="text-[10px] font-bold text-slate-600 font-mono hidden sm:inline-block">
+                    <img src={logo.src} alt={logo.alt} className="max-h-full max-w-[65px] object-contain shrink-0" />
+                    <span className="text-[10px] font-bold text-slate-700 font-mono hidden sm:inline-block whitespace-nowrap">
                       {logo.label}
                     </span>
                   </div>
@@ -175,7 +176,7 @@ export const HeroSection = () => {
                 <div className="space-y-2.5 pt-2">
                   <div className="flex items-center gap-2.5 text-xs text-slate-700 font-medium bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
                     <Award className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Cash Prizes & Certificates for Top Research Papers</span>
+                    <span>Trophies & Certificates for Top Research Papers</span>
                   </div>
                   <div className="flex items-center gap-2.5 text-xs text-slate-700 font-medium bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
                     <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />

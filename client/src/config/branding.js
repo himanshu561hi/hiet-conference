@@ -8,7 +8,7 @@ export const brandingConfig = {
   logos: {
     main: "/eventlogo.png",
     organization: "/clublogo.png",
-    institute: "/edulogo.jpg"
+    institute: "/collegelogo.png"
   },
   themeColors: {
     primary: "#0EA5E9", // Sky Blue

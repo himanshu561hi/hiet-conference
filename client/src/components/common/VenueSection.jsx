@@ -24,7 +24,7 @@ export const VenueSection = () => {
             Conference Venue
           </motion.h2>
           <motion.p variants={fadeUpVariant} className="text-lg text-gray-600">
-            Join us physically at the HIET campus or attend sessions virtually from anywhere in the world.
+            Join us physically at the HIET campus for an enriching offline conference experience.
           </motion.p>
         </motion.div>
 

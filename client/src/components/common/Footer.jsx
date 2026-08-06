@@ -7,6 +7,7 @@ export const Footer = () => {
 
   const logos = [
     { src: '/eventlogo.png', alt: 'NEXUS 2026 Event Logo', title: 'ICDETGT-2026' },
+    { src: '/collegelogo.png', alt: 'HIET College Logo', title: 'HIET Ghaziabad' },
     { src: '/edulogo.jpg', alt: 'Education Council Logo', title: 'Academic Council' },
     { src: '/clublogo.png', alt: 'Tech Fusion Club Logo', title: 'Tech Fusion HIET' },
   ];

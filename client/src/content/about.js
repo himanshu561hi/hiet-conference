@@ -24,7 +24,7 @@ export const aboutContent = {
   icdetgt: {
     theme: "Digital Engineering & Green Technology",
     scopus: "Selected papers will be published in Scopus Indexed proceedings.",
-    hybrid: "Hybrid Mode: Participate physically or present virtually from anywhere in the world.",
+    offline: "Offline Mode: Present your research physically at the vibrant HIET campus.",
     areas: [
       "Sustainable Computing",
       "Renewable Energy Systems",

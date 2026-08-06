@@ -7,7 +7,7 @@ export const faqData = [
   {
     id: "faq2",
     question: "Is it mandatory to attend physically?",
-    answer: "No, NEXUS 2026 operates on a hybrid model. Participants can present their research papers either physically at the HIET campus or virtually."
+    answer: "Yes, NEXUS 2026 operates strictly in offline mode. Participants must present their research papers physically at the HIET campus."
   },
   {
     id: "faq3",

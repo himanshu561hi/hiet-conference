@@ -52,9 +52,9 @@ export const AboutHIET = () => {
           >
             <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/5 via-emerald-500/5 to-transparent pointer-events-none" />
             <img 
-              src="/eventlogo.png" 
-              alt="NEXUS 2026 Event Logo" 
-              className="max-h-full max-w-full object-contain filter drop-shadow-md relative z-10"
+              src="/collegelogo.png" 
+              alt="HIET College Logo" 
+              className="max-h-full max-w-full object-contain filter drop-shadow-md relative z-10 p-4"
             />
           </motion.div>
         </div>

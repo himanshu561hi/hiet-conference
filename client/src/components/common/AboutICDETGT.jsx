@@ -9,7 +9,7 @@ export const AboutICDETGT = () => {
 
   const features = [
     { icon: <BookOpen className="w-6 h-6" />, title: "Scopus Indexed", desc: icdetgt.scopus },
-    { icon: <Globe className="w-6 h-6" />, title: "Hybrid Mode", desc: icdetgt.hybrid },
+    { icon: <Globe className="w-6 h-6" />, title: "Offline Mode", desc: icdetgt.offline },
     { icon: <Zap className="w-6 h-6" />, title: "Theme", desc: icdetgt.theme },
     { icon: <MonitorPlay className="w-6 h-6" />, title: "Digital Eng.", desc: "Focus on modern software ecosystems." },
   ];

@@ -180,7 +180,6 @@ export const RegistrationForm = ({ team, registration, isLeader, isLocked, activ
                       <option value="">Select Preference</option>
                       <option value="Oral">Oral Presentation</option>
                       <option value="Poster">Poster Presentation</option>
-                      <option value="Virtual">Virtual Presentation</option>
                     </select>
                   </div>
                   <div>

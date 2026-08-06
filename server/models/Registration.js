@@ -44,7 +44,7 @@ const registrationSchema = new mongoose.Schema({
   },
   presentationPreference: {
     type: String,
-    enum: ['Oral', 'Poster', 'Virtual', ''],
+    enum: ['Oral', 'Poster', ''],
     default: ''
   },
   specialRequirements: {
